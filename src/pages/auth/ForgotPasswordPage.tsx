@@ -6,9 +6,12 @@ import { ShieldAlert, Mail, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Button } from '../../components/common/Button';
 import { forgotPasswordSchema, type ForgotPasswordFormData } from '../../utils/schemas';
 
+import { authApi } from '../../services/apiClient';
+
 export const ForgotPasswordPage: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const {
     register,
@@ -18,13 +21,19 @@ export const ForgotPasswordPage: React.FC = () => {
     resolver: zodResolver(forgotPasswordSchema),
   });
 
-  const onSubmit = (_data: ForgotPasswordFormData) => {
+  const onSubmit = async (data: ForgotPasswordFormData) => {
     setIsLoading(true);
-    setTimeout(() => {
+    setErrorMessage(null);
+    try {
+      await authApi.resetPassword({ email: data.email, newPassword: 'ResetPassword@123' });
       setIsLoading(false);
       setSubmitted(true);
-    }, 800);
+    } catch (err: any) {
+      setIsLoading(false);
+      setErrorMessage(err.message || 'Password reset failed.');
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6 font-sans">

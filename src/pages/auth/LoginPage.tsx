@@ -6,9 +6,12 @@ import { ShieldAlert, Lock, Mail, UserCheck, KeyRound, ArrowRight } from 'lucide
 import { Button } from '../../components/common/Button';
 import { loginSchema, type LoginFormData } from '../../utils/schemas';
 
+import { authApi } from '../../services/apiClient';
+
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const {
     register,
@@ -17,19 +20,25 @@ export const LoginPage: React.FC = () => {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: 'analyst@intrushield.internal',
-      password: 'Password123!',
+      email: 'admin@intrushield.io',
+      password: 'Admin@12345',
       rememberMe: true,
     },
   });
 
-  const onSubmit = (_data: LoginFormData) => {
+  const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
-    setTimeout(() => {
+    setErrorMessage(null);
+    try {
+      await authApi.login({ email: data.email, password: data.password });
       setIsLoading(false);
       navigate('/dashboard');
-    }, 800);
+    } catch (err: any) {
+      setIsLoading(false);
+      setErrorMessage(err.message || 'Login failed. Please check your credentials.');
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6 font-sans">
@@ -49,6 +58,11 @@ export const LoginPage: React.FC = () => {
 
         {/* Card */}
         <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl space-y-5">
+          {errorMessage && (
+            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono">
+              ⚠️ {errorMessage}
+            </div>
+          )}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Role Select */}
             <div className="space-y-1.5">

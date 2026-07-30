@@ -21,4 +21,10 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+# Database and Server builds
+*.sqlite
+*.sqlite3
+*.db
+server/node_modules
+server/dist
+

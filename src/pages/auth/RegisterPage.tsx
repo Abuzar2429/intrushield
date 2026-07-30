@@ -6,9 +6,12 @@ import { ShieldAlert, Lock, Mail, User, Shield, ArrowRight } from 'lucide-react'
 import { Button } from '../../components/common/Button';
 import { registerSchema, type RegisterFormData } from '../../utils/schemas';
 
+import { authApi } from '../../services/apiClient';
+
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const {
     register,
@@ -18,13 +21,24 @@ export const RegisterPage: React.FC = () => {
     resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = (_data: RegisterFormData) => {
+  const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
-    setTimeout(() => {
+    setErrorMessage(null);
+    try {
+      await authApi.register({
+        email: data.email,
+        password: data.password,
+        name: data.fullName,
+        role: 'SOC Analyst'
+      });
       setIsLoading(false);
       navigate('/dashboard');
-    }, 1000);
+    } catch (err: any) {
+      setIsLoading(false);
+      setErrorMessage(err.message || 'Registration failed.');
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6 font-sans">
@@ -42,6 +56,11 @@ export const RegisterPage: React.FC = () => {
         </div>
 
         <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl space-y-5">
+          {errorMessage && (
+            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono">
+              ⚠️ {errorMessage}
+            </div>
+          )}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5">
               <label className="text-xs font-mono text-slate-300 flex items-center space-x-1">

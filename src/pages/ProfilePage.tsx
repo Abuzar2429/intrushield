@@ -1,10 +1,34 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from '../components/common/Card';
 import { Badge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
-import { UserCheck, Shield, Key, Lock, CheckCircle2, Award, Terminal } from 'lucide-react';
+import { UserCheck, Shield, Key, Lock, CheckCircle2, Award, Terminal, LogOut } from 'lucide-react';
+import { getStoredUser, authApi } from '../services/apiClient';
+import { useNavigate } from 'react-router-dom';
 
 export const ProfilePage: React.FC = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState<any>(getStoredUser() || {
+    name: 'Ashraf',
+    email: 'admin@intrushield.io',
+    role: 'Administrator',
+    id: 'usr-admin-01',
+    createdAt: new Date().toISOString()
+  });
+
+  useEffect(() => {
+    authApi.getProfile()
+      .then(profile => setUser(profile))
+      .catch(() => {
+        // Keep cached user if offline
+      });
+  }, []);
+
+  const handleLogout = () => {
+    authApi.logout();
+    navigate('/login');
+  };
+
   return (
     <div className="space-y-6">
       {/* Profile Header Card */}
@@ -16,23 +40,20 @@ export const ProfilePage: React.FC = () => {
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h2 className="text-2xl font-bold text-white tracking-tight">Ashraf</h2>
-                <Badge variant="info">LEVEL-3 SENIOR SOC ANALYST</Badge>
+                <h2 className="text-2xl font-bold text-white tracking-tight">{user.name}</h2>
+                <Badge variant="info">{user.role.toUpperCase()}</Badge>
               </div>
               <p className="text-xs font-mono text-slate-400 mt-1">
-                SOC Clearance Level: <strong>TS/SCI Security Clearance</strong> | ID: <strong>SOC-ENG-8902</strong>
+                SOC Email: <strong>{user.email}</strong> | Account ID: <strong>{user.id}</strong>
               </p>
               <p className="text-xs text-slate-400 mt-0.5">
-                Primary Operator: Edge Firewall Rule Engine & Threat Hunting Lead
+                Member Since: {new Date(user.createdAt).toLocaleDateString()}
               </p>
             </div>
           </div>
           <div className="flex items-center space-x-3 shrink-0">
-            <Button variant="secondary" size="sm">
-              <Key className="w-4 h-4 mr-1.5" /> Rotate PGP Keys
-            </Button>
-            <Button variant="primary" size="sm">
-              Update SOC Preferences
+            <Button variant="secondary" size="sm" onClick={handleLogout}>
+              <LogOut className="w-4 h-4 mr-1.5 text-red-400" /> Sign Out
             </Button>
           </div>
         </div>

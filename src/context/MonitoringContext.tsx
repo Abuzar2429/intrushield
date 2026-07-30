@@ -45,10 +45,12 @@ export const MonitoringProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         : (Math.random() < 0.2 ? 'Medium' : 'Normal');
 
       const now = new Date();
-      const timeStr = now.toTimeString().split(' ')[0] + '.' + String(now.getMilliseconds()).padStart(3, '0');
+      const timeStr = new Intl.DateTimeFormat('en-US', {
+        hour: '2-digit', minute: '2-digit', second: '2-digit', fractionalSecondDigits: 3, hour12: false
+      }).format(now);
 
       const newPacket: Packet = {
-        id: `pkt-live-${Date.now()}`,
+        id: `pkt-${crypto.randomUUID()}`,
         timestamp: timeStr,
         sourceIp: isAnomaly ? `185.220.${Math.floor(Math.random()*100)}.${randomIpSuffix}` : `10.0.0.${randomIpSuffix}`,
         sourcePort: 49000 + Math.floor(Math.random() * 10000),
