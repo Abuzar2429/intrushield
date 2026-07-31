@@ -5,8 +5,12 @@ import http from 'http';
 import { getDb, initDatabase, saveDb } from './db/database';
 
 import authRouter from './routes/auth';
+import incidentsRouter from './routes/incidents';
+import threatIntelRouter from './routes/threatIntel';
+import pcapRouter from './routes/pcap';
 
 import { auditLogger } from './middleware/auditLogger';
+import { setupLiveStreamWebSocket } from './websocket/liveStream';
 
 dotenv.config();
 
@@ -20,8 +24,11 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(auditLogger);
 
 
-// Auth Routes
+// API Routes
 app.use('/api/auth', authRouter);
+app.use('/api/incidents', incidentsRouter);
+app.use('/api/threat-intel', threatIntelRouter);
+app.use('/api/pcap', pcapRouter);
 
 
 // Health check endpoint
@@ -61,6 +68,9 @@ app.get('/api/health', (req: Request, res: Response) => {
 
 // Create HTTP server
 const server = http.createServer(app);
+
+// Setup WebSocket live packet telemetry stream
+setupLiveStreamWebSocket(server);
 
 // Global Error Handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
