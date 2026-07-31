@@ -1,9 +1,28 @@
 import { Router, Response } from 'express';
+import { z } from 'zod';
 import { getDb, saveDb } from '../db/database';
 import { hashPassword, verifyPassword, generateUUID } from '../utils/cryptoUtils';
 import { generateToken, requireAuth, AuthenticatedRequest } from '../middleware/authMiddleware';
 
 const router = Router();
+
+// Zod Validation Schemas
+const loginSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
+});
+
+const registerSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  name: z.string().min(1, 'Name is required'),
+  role: z.string().optional(),
+});
+
+const resetPasswordSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  newPassword: z.string().min(6, 'Password must be at least 6 characters'),
+});
 
 // Helper to convert SQL statement result to object array
 function queryObjects(sql: string, params: any[] = []): Record<string, any>[] {
@@ -20,12 +39,14 @@ function queryObjects(sql: string, params: any[] = []): Record<string, any>[] {
 
 // Login Endpoint
 router.post('/login', (req: AuthenticatedRequest, res: Response) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    res.status(400).json({ error: 'Email and password are required.' });
+  const parseResult = loginSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.errors[0]?.message || 'Invalid input';
+    res.status(400).json({ error: errorMsg });
     return;
   }
+
+  const { email, password } = parseResult.data;
 
   try {
     const users = queryObjects('SELECT * FROM users WHERE email = ?', [email.toLowerCase().trim()]);
@@ -67,17 +88,14 @@ router.post('/login', (req: AuthenticatedRequest, res: Response) => {
 
 // Register Endpoint
 router.post('/register', (req: AuthenticatedRequest, res: Response) => {
-  const { email, password, name, role } = req.body;
-
-  if (!email || !password || !name) {
-    res.status(400).json({ error: 'Email, password, and name are required.' });
+  const parseResult = registerSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.errors[0]?.message || 'Invalid input';
+    res.status(400).json({ error: errorMsg });
     return;
   }
 
-  if (password.length < 6) {
-    res.status(400).json({ error: 'Password must be at least 6 characters.' });
-    return;
-  }
+  const { email, password, name, role } = parseResult.data;
 
   try {
     const cleanEmail = email.toLowerCase().trim();
@@ -148,17 +166,14 @@ router.get('/profile', requireAuth, (req: AuthenticatedRequest, res: Response) =
 
 // Reset Password Endpoint
 router.post('/reset-password', (req: AuthenticatedRequest, res: Response) => {
-  const { email, newPassword } = req.body;
-
-  if (!email || !newPassword) {
-    res.status(400).json({ error: 'Email and newPassword are required.' });
+  const parseResult = resetPasswordSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    const errorMsg = parseResult.error.errors[0]?.message || 'Invalid input';
+    res.status(400).json({ error: errorMsg });
     return;
   }
 
-  if (newPassword.length < 6) {
-    res.status(400).json({ error: 'Password must be at least 6 characters.' });
-    return;
-  }
+  const { email, newPassword } = parseResult.data;
 
   try {
     const cleanEmail = email.toLowerCase().trim();

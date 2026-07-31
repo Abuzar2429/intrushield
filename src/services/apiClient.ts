@@ -32,8 +32,9 @@ export function setStoredUser(user: any) {
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = getStoredToken();
 
+  const isFormData = options.body instanceof FormData;
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     ...(options.headers as Record<string, string>),
   };
 
@@ -91,5 +92,91 @@ export const authApi = {
 
   logout: () => {
     clearStoredToken();
+  },
+};
+
+export const incidentsApi = {
+  getIncidents: async (filters?: { status?: string; severity?: string }) => {
+    const params = new URLSearchParams();
+    if (filters?.status) params.append('status', filters.status);
+    if (filters?.severity) params.append('severity', filters.severity);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+
+    return request<{ incidents: any[]; count: number }>(`/incidents${queryString}`);
+  },
+
+  getIncidentById: async (id: string) => {
+    return request<{ incident: any }>(`/incidents/${id}`);
+  },
+
+  createIncident: async (incidentData: {
+    title: string;
+    severity: string;
+    status?: string;
+    sourceIp: string;
+    targetIp: string;
+    threatScore?: number;
+    description?: string;
+    mitigationStatus?: string;
+  }) => {
+    return request<{ message: string; incident: any }>('/incidents', {
+      method: 'POST',
+      body: JSON.stringify(incidentData),
+    });
+  },
+
+  updateStatus: async (id: string, statusData: { status?: string; mitigationStatus?: string }) => {
+    return request<{ message: string; incident: any }>(`/incidents/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify(statusData),
+    });
+  },
+};
+
+export const threatIntelApi = {
+  getIocs: async (params?: { query?: string; type?: string; riskLevel?: string }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.query) searchParams.append('query', params.query);
+    if (params?.type) searchParams.append('type', params.type);
+    if (params?.riskLevel) searchParams.append('riskLevel', params.riskLevel);
+    const queryString = searchParams.toString() ? `?${searchParams.toString()}` : '';
+
+    return request<{ iocs: any[]; count: number }>(`/threat-intel${queryString}`);
+  },
+
+  addIoc: async (iocData: {
+    ioc: string;
+    type: string;
+    threatActor?: string;
+    riskLevel: string;
+    confidence?: number;
+    description?: string;
+  }) => {
+    return request<{ message: string; ioc: any }>('/threat-intel', {
+      method: 'POST',
+      body: JSON.stringify(iocData),
+    });
+  },
+
+  deleteIoc: async (id: string) => {
+    return request<{ message: string; id: string }>(`/threat-intel/${id}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
+export const pcapApi = {
+  getScans: async () => {
+    return request<{ scans: any[]; count: number }>('/pcap/scans');
+  },
+
+  uploadPcap: async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return request<{ message: string; scan: any }>('/pcap/upload', {
+      method: 'POST',
+      body: formData,
+    });
   },
 };

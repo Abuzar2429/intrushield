@@ -3,6 +3,7 @@ import type { Packet, PCAPAnalysisResult } from '../types/packet';
 import type { Incident } from '../types/incident';
 import { MOCK_PACKETS } from '../mock/packets';
 import { MOCK_INCIDENTS } from '../mock/incidents';
+import { incidentsApi, pcapApi } from '../services/apiClient';
 
 interface MonitoringContextType {
   packets: Packet[];
@@ -12,10 +13,11 @@ interface MonitoringContextType {
   activeIncident: Incident | null;
   setActiveIncident: (incident: Incident | null) => void;
   pcapResult: PCAPAnalysisResult | null;
-  analyzePcap: (file: File | string) => void;
+  analyzePcap: (file: File | string) => Promise<void>;
   clearPcapResult: () => void;
   threatScore: number;
   packetsPerSec: number;
+  isConnectedToWs: boolean;
 }
 
 const MonitoringContext = createContext<MonitoringContextType | undefined>(undefined);
@@ -23,15 +25,155 @@ const MonitoringContext = createContext<MonitoringContextType | undefined>(undef
 export const MonitoringProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [packets, setPackets] = useState<Packet[]>(MOCK_PACKETS);
   const [isLiveStreaming, setIsLiveStreaming] = useState<boolean>(true);
-  const [incidents] = useState<Incident[]>(MOCK_INCIDENTS);
+  const [incidents, setIncidents] = useState<Incident[]>(MOCK_INCIDENTS);
   const [activeIncident, setActiveIncident] = useState<Incident | null>(MOCK_INCIDENTS[0]);
   const [pcapResult, setPcapResult] = useState<PCAPAnalysisResult | null>(null);
   const [threatScore, setThreatScore] = useState<number>(28);
   const [packetsPerSec, setPacketsPerSec] = useState<number>(34100);
+  const [isConnectedToWs, setIsConnectedToWs] = useState<boolean>(false);
 
-  // Live packet stream simulation interval
+  // Fetch initial Incidents from backend DB on mount
+  useEffect(() => {
+    async function loadBackendIncidents() {
+      try {
+        const res = await incidentsApi.getIncidents();
+        if (res.incidents && res.incidents.length > 0) {
+          const formatted: Incident[] = res.incidents.map(i => ({
+            id: i.id,
+            incidentCode: i.id,
+            title: i.title,
+            category: i.title.includes('SYN') ? 'DDoS' : i.title.includes('SSH') ? 'Port Scan' : 'Data Exfiltration',
+            riskLevel: i.severity === 'Critical' || i.severity === 'High' || i.severity === 'Medium' ? i.severity : 'Normal',
+            riskScore: i.threatScore || 85,
+            confidenceScore: 96.5,
+            detectedAt: i.timestamp,
+            updatedAt: i.timestamp,
+            status: i.status === 'Active' ? 'Investigating' : i.status === 'Resolved' ? 'Resolved' : 'Open',
+            primaryAttackerIp: i.sourceIp,
+            targetedHostIp: i.targetIp,
+            affectedSystemsCount: 1,
+            timeline: [
+              {
+                id: `tl-${i.id}`,
+                timestamp: i.timestamp,
+                title: 'Anomaly Triggered',
+                description: i.description || i.title,
+                severity: i.severity === 'Critical' || i.severity === 'High' || i.severity === 'Medium' ? i.severity : 'Normal',
+                source: 'IntruShield Engine'
+              }
+            ],
+            explanation: {
+              naturalLanguageReasoning: i.description || 'Flow duration and packet rate exceeded SOC baselines.',
+              shapWaterfall: [
+                { featureName: 'syn_flag_count', description: 'SYN flag frequency ratio', value: '4,500', impactScore: 0.42 },
+                { featureName: 'flow_bytes_sec', description: 'Flow bytes per second rate', value: '45MB/s', impactScore: 0.31 }
+              ],
+              confidenceDistribution: [
+                { label: 'SYN Flood', value: 92.4 },
+                { label: 'Normal Traffic', value: 7.6 }
+              ]
+            },
+            evidencePackets: [],
+            remediationActions: [
+              {
+                id: `act-${i.id}`,
+                actionTitle: 'Block Attacker IP on Gateway Firewall',
+                category: 'Firewall Rule',
+                target: i.sourceIp,
+                executed: i.mitigationStatus?.includes('Resolved') || false,
+                recommendedReason: 'Attacker IP exhibited sustained high packet rate anomaly.'
+              }
+            ]
+          }));
+          setIncidents(formatted);
+          setActiveIncident(formatted[0]);
+        }
+      } catch (err) {
+        // Silent fallback to mock incidents if server is offline
+      }
+    }
+    loadBackendIncidents();
+  }, []);
+
+  // Real-time WebSocket connection to backend /ws
   useEffect(() => {
     if (!isLiveStreaming) return;
+
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.hostname}:5000/ws`;
+    let socket: WebSocket | null = null;
+
+    try {
+      socket = new WebSocket(wsUrl);
+
+      socket.onopen = () => {
+        setIsConnectedToWs(true);
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'PACKET_TELEMETRY' && data.payload) {
+            const raw = data.payload;
+            const now = new Date();
+            const timeStr = new Intl.DateTimeFormat('en-US', {
+              hour: '2-digit', minute: '2-digit', second: '2-digit', fractionalSecondDigits: 3, hour12: false
+            }).format(now);
+
+            const incomingPacket: Packet = {
+              id: raw.id,
+              timestamp: timeStr,
+              sourceIp: raw.sourceIp,
+              sourcePort: raw.sourcePort,
+              destinationIp: raw.destinationIp,
+              destinationPort: raw.destinationPort,
+              protocol: raw.protocol,
+              packetSize: raw.packetSize,
+              riskLevel: raw.riskLevel,
+              riskScore: raw.riskScore,
+              predictedAttackType: raw.predictedAttackType,
+              status: raw.status === 'Blocked' ? 'Dropped' : raw.status === 'Allowed' ? 'Passed' : raw.status,
+              payloadSample: raw.payloadSample,
+              flags: raw.riskLevel === 'Critical' ? ['SYN', 'ECE'] : ['ACK'],
+              ttl: raw.ttl,
+              flowDurationMs: raw.flowDurationMs
+            };
+
+            setPackets(prev => [incomingPacket, ...prev.slice(0, 49)]);
+            setPacketsPerSec(Math.floor(34000 + (Math.random() * 2000 - 1000)));
+
+            if (raw.riskLevel === 'Critical') {
+              setThreatScore(prev => Math.min(100, prev + 1));
+            } else {
+              setThreatScore(prev => Math.max(15, prev - 0.1));
+            }
+          }
+        } catch {
+          // Ignore malformed WS frames
+        }
+      };
+
+      socket.onerror = () => {
+        setIsConnectedToWs(false);
+      };
+
+      socket.onclose = () => {
+        setIsConnectedToWs(false);
+      };
+    } catch {
+      setIsConnectedToWs(false);
+    }
+
+    return () => {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.close();
+      }
+    };
+  }, [isLiveStreaming]);
+
+  // Fallback simulator loop if WebSocket is not connected
+  useEffect(() => {
+    if (!isLiveStreaming || isConnectedToWs) return;
 
     const interval = setInterval(() => {
       const randomIpSuffix = Math.floor(Math.random() * 254) + 1;
@@ -39,7 +181,7 @@ export const MonitoringProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const protocols: ('TCP' | 'UDP' | 'HTTP' | 'DNS')[] = ['TCP', 'UDP', 'HTTP', 'DNS'];
       const protocol = protocols[Math.floor(Math.random() * protocols.length)];
 
-      const isAnomaly = Math.random() < 0.15; // 15% chance of suspicious/critical packet
+      const isAnomaly = Math.random() < 0.15;
       const riskLevel = isAnomaly 
         ? (Math.random() < 0.3 ? 'Critical' : 'High') 
         : (Math.random() < 0.2 ? 'Medium' : 'Normal');
@@ -68,26 +210,60 @@ export const MonitoringProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         flowDurationMs: Number((Math.random() * 10).toFixed(2))
       };
 
-      setPackets(prev => [newPacket, ...prev.slice(0, 49)]); // Keep latest 50 packets
-
-      // Dynamically fluctuate threat score and pps slightly
+      setPackets(prev => [newPacket, ...prev.slice(0, 49)]);
       setPacketsPerSec(Math.floor(34000 + (Math.random() * 2000 - 1000)));
+
       if (isAnomaly && riskLevel === 'Critical') {
         setThreatScore(prev => Math.min(100, prev + 1));
       } else {
         setThreatScore(prev => Math.max(15, prev - 0.2));
       }
-
     }, 2500);
 
     return () => clearInterval(interval);
-  }, [isLiveStreaming]);
+  }, [isLiveStreaming, isConnectedToWs]);
 
   const toggleLiveStreaming = () => {
     setIsLiveStreaming(prev => !prev);
   };
 
-  const analyzePcap = (file: File | string) => {
+  const analyzePcap = async (file: File | string) => {
+    if (typeof file === 'object' && file instanceof File) {
+      try {
+        const res = await pcapApi.uploadPcap(file);
+        if (res.scan) {
+          const s = res.scan;
+          const result: PCAPAnalysisResult = {
+            fileName: s.fileName,
+            fileSizeBytes: s.fileSizeBytes,
+            totalPackets: s.totalPackets,
+            flowCount: s.flowCount,
+            analysisDurationSeconds: s.analysisDurationSeconds,
+            attackProbability: s.attackProbability,
+            classifiedThreat: s.classifiedThreat,
+            riskLevel: s.riskLevel === 'Critical' || s.riskLevel === 'High' ? s.riskLevel : 'Normal',
+            predictedConfidence: s.predictedConfidence,
+            extractedFeatures: Object.entries(s.extractedFeatures || {}).map(([key, val]) => ({
+              name: key,
+              value: String(val)
+            })),
+            topContributingFeatures: (s.topFeatures || []).map((tf: any) => ({
+              featureName: tf.name,
+              description: `Feature impact weight: ${tf.importance}`,
+              value: String(tf.value),
+              impactScore: tf.importance
+            }))
+          };
+
+          setPcapResult(result);
+          return;
+        }
+      } catch (err) {
+        // Fallback to local analysis calculation if backend upload fails
+      }
+    }
+
+    // Local fallback
     const fileNameStr = typeof file === 'string' ? file : file.name;
     const isDdosSample = fileNameStr.toLowerCase().includes('ddos') || fileNameStr.toLowerCase().includes('syn');
 
@@ -147,6 +323,7 @@ export const MonitoringProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         clearPcapResult,
         threatScore: Math.round(threatScore),
         packetsPerSec,
+        isConnectedToWs,
       }}
     >
       {children}
