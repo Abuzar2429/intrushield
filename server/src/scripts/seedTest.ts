@@ -6,9 +6,9 @@ async function testSeed() {
 
   const db = getDb();
   
-  const userCount = (db.exec('SELECT COUNT(*) as count FROM users')[0]?.values[0][0]) || 0;
-  const incidentCount = (db.exec('SELECT COUNT(*) as count FROM incidents')[0]?.values[0][0]) || 0;
-  const threatCount = (db.exec('SELECT COUNT(*) as count FROM threat_intel')[0]?.values[0][0]) || 0;
+  const userCount = Number(db.exec('SELECT COUNT(*) as count FROM users')[0]?.values[0][0] || 0);
+  const incidentCount = Number(db.exec('SELECT COUNT(*) as count FROM incidents')[0]?.values[0][0] || 0);
+  const threatCount = Number(db.exec('SELECT COUNT(*) as count FROM threat_intel')[0]?.values[0][0] || 0);
 
   console.log(`[SEED TEST] Database Status:`);
   console.log(` - Users: ${userCount}`);
@@ -17,10 +17,10 @@ async function testSeed() {
 
   if (userCount > 0 && incidentCount > 0 && threatCount > 0) {
     console.log('[SEED TEST] ✅ Database verification PASSED cleanly.');
-    process.exit(0);
+    process.exitCode = 0;
   } else {
     console.error('[SEED TEST] ❌ Database verification FAILED.');
-    process.exit(1);
+    process.exitCode = 1;
   }
 }
 
