@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import dotenv from 'dotenv';
 import http from 'http';
 import { getDb, initDatabase, saveDb } from './db/database';
@@ -8,6 +9,7 @@ import authRouter from './routes/auth';
 import incidentsRouter from './routes/incidents';
 import threatIntelRouter from './routes/threatIntel';
 import pcapRouter from './routes/pcap';
+import mitigationRouter from './routes/mitigation';
 
 import { auditLogger } from './middleware/auditLogger';
 import { setupLiveStreamWebSocket } from './websocket/liveStream';
@@ -18,6 +20,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Express Middleware
+app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -29,6 +32,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/incidents', incidentsRouter);
 app.use('/api/threat-intel', threatIntelRouter);
 app.use('/api/pcap', pcapRouter);
+app.use('/api/mitigation', mitigationRouter);
 
 
 // Health check endpoint
@@ -99,8 +103,11 @@ async function startServer() {
   });
 }
 
-startServer().catch(err => {
-  console.error('Failed to start server:', err);
-});
+if (process.env.NODE_ENV !== 'test') {
+  startServer().catch(err => {
+    console.error('Failed to start server:', err);
+  });
+}
 
-export { app, server };
+export { app, server, startServer };
+
