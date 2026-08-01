@@ -180,3 +180,17 @@ export const pcapApi = {
     });
   },
 };
+
+export const mitigationApi = {
+  blockIp: async (params: { ip: string; reason?: string; actionType?: string }) => {
+    return request<{ message: string; rule: any }>('/mitigation/block-ip', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+  },
+
+  getActiveRules: async () => {
+    return request<{ rules: any[]; count: number }>('/mitigation/active-rules');
+  },
+};
+
