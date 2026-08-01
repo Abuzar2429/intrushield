@@ -82,11 +82,12 @@ export const LoginPage: React.FC = () => {
 
             {/* Email */}
             <div className="space-y-1.5">
-              <label className="text-xs font-mono text-slate-300 flex items-center space-x-1">
+              <label htmlFor="email" className="text-xs font-mono text-slate-300 flex items-center space-x-1">
                 <Mail className="w-3.5 h-3.5 text-slate-400" />
                 <span>Enterprise Email</span>
               </label>
               <input
+                id="email"
                 type="email"
                 {...register('email')}
                 className="w-full px-3 py-2 text-sm font-mono bg-slate-950 border border-slate-800 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
@@ -99,7 +100,7 @@ export const LoginPage: React.FC = () => {
             {/* Password */}
             <div className="space-y-1.5">
               <div className="flex justify-between items-center">
-                <label className="text-xs font-mono text-slate-300 flex items-center space-x-1">
+                <label htmlFor="password" className="text-xs font-mono text-slate-300 flex items-center space-x-1">
                   <KeyRound className="w-3.5 h-3.5 text-slate-400" />
                   <span>Password</span>
                 </label>
@@ -108,6 +109,7 @@ export const LoginPage: React.FC = () => {
                 </Link>
               </div>
               <input
+                id="password"
                 type="password"
                 {...register('password')}
                 className="w-full px-3 py-2 text-sm font-mono bg-slate-950 border border-slate-800 rounded-lg text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
