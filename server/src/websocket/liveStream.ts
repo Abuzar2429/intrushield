@@ -1,5 +1,6 @@
 import { Server as HttpServer } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
+import { alertService } from '../services/alertService';
 
 export interface PacketPayload {
   id: string;
@@ -72,6 +73,16 @@ export function setupLiveStreamWebSocket(server: HttpServer) {
 
   let isStreaming = true;
 
+  // Subscribe alertService to WebSocket broadcasts
+  alertService.subscribe((alertPayload) => {
+    const alertMsg = JSON.stringify({ type: 'CRITICAL_ALERT', payload: alertPayload });
+    wss.clients.forEach(client => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(alertMsg);
+      }
+    });
+  });
+
   const interval = setInterval(() => {
     if (!isStreaming || wss.clients.size === 0) return;
 
@@ -83,6 +94,22 @@ export function setupLiveStreamWebSocket(server: HttpServer) {
         client.send(message);
       }
     });
+
+    // Dispatch alert if packet threat score crosses critical threshold
+    if (packet.riskScore >= 90 && packet.riskLevel === 'Critical') {
+      alertService.dispatchAlert({
+        alertId: `ALT-${Date.now().toString(36).toUpperCase()}`,
+        incidentCode: `INC-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+        title: packet.predictedAttackType,
+        severity: 'Critical',
+        threatScore: packet.riskScore,
+        sourceIp: packet.sourceIp,
+        targetIp: packet.destinationIp,
+        timestamp: packet.timestamp,
+        description: `Automated ML Classifier detected high probability ${packet.predictedAttackType} from ${packet.sourceIp}`,
+        recommendedAction: `Enforce BGP Flowspec rate limit or iptables drop rule on ${packet.sourceIp}`,
+      });
+    }
   }, 400);
 
   wss.on('connection', (ws: WebSocket) => {
