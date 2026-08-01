@@ -1,5 +1,6 @@
 import React from 'react';
 import type { RiskLevel } from '../../types/packet';
+import { cn } from '../../utils/cn';
 
 interface BadgeProps {
   children?: React.ReactNode;
@@ -12,7 +13,7 @@ export const Badge: React.FC<BadgeProps> = ({
   children,
   variant = 'default',
   size = 'md',
-  className = '',
+  className,
 }) => {
   const getVariantStyles = () => {
     switch (variant) {
@@ -50,7 +51,12 @@ export const Badge: React.FC<BadgeProps> = ({
 
   return (
     <span
-      className={`inline-flex items-center justify-center rounded-md border ${getVariantStyles()} ${getSizeStyles()} ${className}`}
+      className={cn(
+        'inline-flex items-center justify-center rounded-md border',
+        getVariantStyles(),
+        getSizeStyles(),
+        className
+      )}
     >
       {children || variant}
     </span>

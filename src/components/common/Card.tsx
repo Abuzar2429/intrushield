@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../../utils/cn';
 
 interface CardProps {
   children: React.ReactNode;
@@ -13,7 +14,7 @@ interface CardProps {
 
 export const Card: React.FC<CardProps> = ({
   children,
-  className = '',
+  className,
   header,
   footer,
   title,
@@ -24,7 +25,10 @@ export const Card: React.FC<CardProps> = ({
   const actionElement = action || headerAction;
   return (
     <div
-      className={`bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm transition-all duration-200 ${className}`}
+      className={cn(
+        'bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm transition-all duration-200',
+        className
+      )}
     >
       {(header || title) && (
         <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">

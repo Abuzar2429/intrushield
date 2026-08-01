@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, X } from 'lucide-react';
+import { cn } from '../../utils/cn';
 
 interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   value: string;
@@ -10,12 +11,12 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   value,
   onClear,
   placeholder = 'Search IPs, ports, CVEs, or attack signatures...',
-  className = '',
+  className,
   onChange,
   ...props
 }) => {
   return (
-    <div className={`relative flex items-center w-full ${className}`}>
+    <div className={cn('relative flex items-center w-full', className)}>
       <Search className="absolute left-3 w-4 h-4 text-slate-400 pointer-events-none" />
       <input
         type="text"

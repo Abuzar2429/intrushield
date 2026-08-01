@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
+import { cn } from '../../utils/cn';
 
 interface ModalProps {
   isOpen: boolean;
@@ -58,7 +59,10 @@ export const Modal: React.FC<ModalProps> = ({
 
       {/* Modal Dialog */}
       <div
-        className={`relative w-full ${getMaxWidth()} bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl z-10 my-8 overflow-hidden`}
+        className={cn(
+          'relative w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl z-10 my-8 overflow-hidden',
+          getMaxWidth()
+        )}
       >
         {title && (
           <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
