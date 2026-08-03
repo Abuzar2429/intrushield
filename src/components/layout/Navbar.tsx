@@ -54,6 +54,13 @@ export const Navbar: React.FC = () => {
           <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
           <span>{(packetsPerSec / 1000).toFixed(1)}k PPS</span>
         </div>
+
+        {/* Bright Green Git Connected Badge */}
+        <div className="flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.25)]">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+          <span className="font-bold">GIT:</span>
+          <span>main (Abuzar2429/intrushield)</span>
+        </div>
       </div>
 
       {/* Right Actions */}
