@@ -1,0 +1,36 @@
+name: IntruShield CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Frontend Dependencies
+        run: npm ci
+
+      - name: Install Backend Server Dependencies
+        run: cd server && npm ci
+
+      - name: Codebase Lint Check
+        run: npm run lint
+
+      - name: Run Frontend & Backend Test Suites
+        run: npm run test:all
+
+      - name: Production Build Compilation
+        run: npm run build
