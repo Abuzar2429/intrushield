@@ -30,3 +30,6 @@ If you are developing a production application, we recommend enabling type-aware
 ```
 
 See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+<img width="1910" height="942" alt="image" src="https://github.com/user-attachments/assets/c2578adc-9a62-4606-b743-173f5281b875" />
+<img width="1919" height="934" alt="image" src="https://github.com/user-attachments/assets/64496c01-0517-47c4-840d-7f587346158b" />
+
