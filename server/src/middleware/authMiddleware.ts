@@ -18,7 +18,7 @@ export function generateToken(payload: { id: string; email: string; role: string
 export function verifyToken(token: string): { id: string; email: string; role: string } | null {
   try {
     return jwt.verify(token, JWT_SECRET) as { id: string; email: string; role: string };
-  } catch (err) {
+  } catch {
     return null;
   }
 }
