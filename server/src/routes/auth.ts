@@ -95,7 +95,7 @@ router.post('/register', (req: AuthenticatedRequest, res: Response) => {
     return;
   }
 
-  const { email, password, name, role } = parseResult.data;
+  const { email, password, name } = parseResult.data;
 
   try {
     const cleanEmail = email.toLowerCase().trim();
