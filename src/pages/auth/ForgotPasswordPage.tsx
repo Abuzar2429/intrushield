@@ -68,6 +68,11 @@ export const ForgotPasswordPage: React.FC = () => {
             </div>
           ) : (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              {errorMessage && (
+                <div className="p-3 rounded-lg bg-red-950/40 border border-red-800/50 text-red-400 text-xs font-mono">
+                  {errorMessage}
+                </div>
+              )}
               <div className="space-y-1.5">
                 <label className="text-xs font-mono text-slate-300 flex items-center space-x-1">
                   <Mail className="w-3.5 h-3.5 text-slate-400" />
