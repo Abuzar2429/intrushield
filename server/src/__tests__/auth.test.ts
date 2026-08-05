@@ -75,4 +75,24 @@ describe('Auth REST API Endpoints', () => {
 
     expect(res.status).toBe(401);
   });
+
+  it('should reject profile request with malformed Bearer token', async () => {
+    const res = await request(app)
+      .get('/api/auth/profile')
+      .set('Authorization', 'Bearer INVALID_JWT_SECRET_PAYLOAD');
+
+    expect(res.status).toBe(401);
+    expect(res.body).toHaveProperty('error');
+  });
+
+  it('should reject unauthenticated password reset attempt', async () => {
+    const res = await request(app)
+      .post('/api/auth/reset-password')
+      .send({
+        email: testUser.email,
+        newPassword: 'HackedPassword123!',
+      });
+
+    expect(res.status).toBe(401);
+  });
 });
