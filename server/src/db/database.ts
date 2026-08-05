@@ -40,7 +40,7 @@ export async function initDatabase() {
   // WAL / PRAGMA configurations
   try {
     db.run('PRAGMA foreign_keys = ON;');
-  } catch (e) {
+  } catch (_e) {
     // Ignore if unsupported in WASM build
   }
 

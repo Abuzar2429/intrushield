@@ -142,7 +142,7 @@ export function setupLiveStreamWebSocket(server: HttpServer) {
           isStreaming = true;
           ws.send(JSON.stringify({ type: 'CONTROL_ACK', status: 'RESUMING' }));
         }
-      } catch (err) {
+      } catch (_err) {
         // Ignore unparseable control messages
       }
     });
