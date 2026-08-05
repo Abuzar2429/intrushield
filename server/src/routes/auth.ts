@@ -37,7 +37,11 @@ function queryObjects(sql: string, params: any[] = []): Record<string, any>[] {
   return rows;
 }
 
-// Login Endpoint
+/**
+ * @route POST /api/auth/login
+ * @desc Authenticate user credentials and return JWT bearer token
+ * @access Public
+ */
 router.post('/login', (req: AuthenticatedRequest, res: Response) => {
   const parseResult = loginSchema.safeParse(req.body);
   if (!parseResult.success) {
