@@ -33,7 +33,11 @@ function queryObjects(sql: string, params: any[] = []): Record<string, any>[] {
   return rows;
 }
 
-// Get All Incidents (Protected)
+/**
+ * @route GET /api/incidents
+ * @desc Fetch filtered list of security incidents
+ * @access Private (Requires Auth Token)
+ */
 router.get('/', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
     const { status, severity } = req.query;
