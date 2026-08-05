@@ -3,7 +3,7 @@ import { Card } from '../components/common/Card';
 import { Badge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
 import { useMonitoring } from '../context/MonitoringContext';
-import { Cpu, Zap, HelpCircle, CheckCircle2, AlertOctagon, BarChart2 } from 'lucide-react';
+import { Cpu, Zap, CheckCircle2, AlertOctagon, BarChart2 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from 'recharts';
 
 export const ExplainableAIPage: React.FC = () => {
