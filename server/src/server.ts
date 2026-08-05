@@ -19,11 +19,21 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Express Middleware
-app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
-app.use(cors({ origin: '*', credentials: true }));
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+// Express Middleware Hardening
+app.use(helmet());
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, same-origin) or matching host
+    if (!origin || origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1')) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Dev fallback
+    }
+  },
+  credentials: true
+}));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(auditLogger);
 
 
@@ -65,7 +75,7 @@ app.get('/api/health', (req: Request, res: Response) => {
     res.status(500).json({
       status: 'error',
       service: 'IntruShield NIDS Core Engine',
-      error: err.message
+      error: 'Health check failed'
     });
   }
 });
@@ -79,9 +89,12 @@ setupLiveStreamWebSocket(server);
 // Global Error Handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error('[SERVER ERROR]', err);
-  res.status(err.status || 500).json({
-    error: err.message || 'Internal Server Error'
-  });
+  const status = err.status || 500;
+  const message = process.env.NODE_ENV === 'production' && status === 500
+    ? 'Internal Server Error'
+    : (err.message || 'Internal Server Error');
+
+  res.status(status).json({ error: message });
 });
 
 // Initialize DB and start listening

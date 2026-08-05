@@ -1,6 +1,7 @@
-import { Server as HttpServer } from 'http';
+import { Server as HttpServer, IncomingMessage } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
 import { alertService } from '../services/alertService';
+import { verifyToken } from '../middleware/authMiddleware';
 
 export interface PacketPayload {
   id: string;
@@ -112,13 +113,23 @@ export function setupLiveStreamWebSocket(server: HttpServer) {
     }
   }, 400);
 
-  wss.on('connection', (ws: WebSocket) => {
-    console.log('[WEBSOCKET] Client connected to live packet telemetry stream.');
+  wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
+    const requestUrl = new URL(req.url || '', `http://${req.headers.host || 'localhost'}`);
+    const token = requestUrl.searchParams.get('token');
+    const user = token ? verifyToken(token) : null;
+
+    if (!user) {
+      console.warn('[WEBSOCKET] Unauthenticated WebSocket connection rejected.');
+      ws.close(4001, 'Unauthorized: Invalid or missing token');
+      return;
+    }
+
+    console.log(`[WEBSOCKET] Client connected as ${user.email} (${user.role}).`);
 
     // Send initial status message
     ws.send(JSON.stringify({
       type: 'SYSTEM_STATUS',
-      payload: { status: 'CONNECTED', message: 'IntruShield Telemetry Engine Active' }
+      payload: { status: 'CONNECTED', message: 'IntruShield Telemetry Engine Active', user: user.email }
     }));
 
     ws.on('message', (data: string) => {

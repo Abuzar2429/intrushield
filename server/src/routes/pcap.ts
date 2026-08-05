@@ -1,7 +1,7 @@
 import { Router, Response } from 'express';
 import multer from 'multer';
 import { getDb, saveDb } from '../db/database';
-import { AuthenticatedRequest } from '../middleware/authMiddleware';
+import { requireAuth, AuthenticatedRequest } from '../middleware/authMiddleware';
 import { classifyNetworkFlow } from '../ml/inferenceEngine';
 
 const router = Router();
@@ -19,8 +19,8 @@ function queryObjects(sql: string, params: any[] = []): Record<string, any>[] {
   return rows;
 }
 
-// Get All Historical PCAP Scans
-router.get('/scans', (req: AuthenticatedRequest, res: Response) => {
+// Get All Historical PCAP Scans (Protected)
+router.get('/scans', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
     const rows = queryObjects('SELECT * FROM pcap_scans ORDER BY created_at DESC');
     const scans = rows.map(r => ({
@@ -45,8 +45,8 @@ router.get('/scans', (req: AuthenticatedRequest, res: Response) => {
   }
 });
 
-// Upload and Analyze PCAP File
-router.post('/upload', upload.single('file'), (req: AuthenticatedRequest, res: Response) => {
+// Upload and Analyze PCAP File (Protected)
+router.post('/upload', requireAuth, upload.single('file'), (req: AuthenticatedRequest, res: Response) => {
   try {
     const file = req.file;
     const fileName = file?.originalname || req.body?.fileName || 'capture_sample.pcap';

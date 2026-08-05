@@ -12,8 +12,15 @@ describe('Threat Intel REST API Endpoints', () => {
     authToken = res.body.token;
   });
 
-  it('should fetch list of threat intelligence indicators', async () => {
+  it('should reject fetching threat intel indicators without auth token', async () => {
     const res = await request(app).get('/api/threat-intel');
+    expect(res.status).toBe(401);
+  });
+
+  it('should fetch list of threat intelligence indicators with auth token', async () => {
+    const res = await request(app)
+      .get('/api/threat-intel')
+      .set('Authorization', `Bearer ${authToken}`);
 
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.iocs)).toBe(true);

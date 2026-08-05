@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { z } from 'zod';
 import { getDb, saveDb } from '../db/database';
 import { requireAuth, AuthenticatedRequest } from '../middleware/authMiddleware';
+import { requireRole } from '../middleware/requireRole';
 
 const router = Router();
 
@@ -26,8 +27,8 @@ function queryObjects(sql: string, params: any[] = []): Record<string, any>[] {
   return rows;
 }
 
-// Get All Threat Intel IOCs
-router.get('/', (req: AuthenticatedRequest, res: Response) => {
+// Get All Threat Intel IOCs (Protected)
+router.get('/', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
     const { query, type, riskLevel } = req.query;
     let sql = 'SELECT * FROM threat_intel WHERE 1=1';
@@ -120,8 +121,8 @@ router.post('/', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   }
 });
 
-// Remove Threat Intel IOC (Protected)
-router.delete('/:id', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+// Remove Threat Intel IOC (Protected & Administrator RBAC Enforced)
+router.delete('/:id', requireAuth, requireRole('Administrator'), (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
     const cleanId = String(id);

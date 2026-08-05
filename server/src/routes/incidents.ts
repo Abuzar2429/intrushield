@@ -33,8 +33,8 @@ function queryObjects(sql: string, params: any[] = []): Record<string, any>[] {
   return rows;
 }
 
-// Get All Incidents (Optional query filters: status, severity)
-router.get('/', (req: AuthenticatedRequest, res: Response) => {
+// Get All Incidents (Protected)
+router.get('/', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
     const { status, severity } = req.query;
     let sql = 'SELECT * FROM incidents WHERE 1=1';
@@ -71,8 +71,8 @@ router.get('/', (req: AuthenticatedRequest, res: Response) => {
   }
 });
 
-// Get Single Incident by ID
-router.get('/:id', (req: AuthenticatedRequest, res: Response) => {
+// Get Single Incident by ID (Protected)
+router.get('/:id', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
     const cleanId = String(id);

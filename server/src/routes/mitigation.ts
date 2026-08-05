@@ -2,11 +2,12 @@ import { Router, Response } from 'express';
 import { z } from 'zod';
 import { getDb, saveDb } from '../db/database';
 import { requireAuth, AuthenticatedRequest } from '../middleware/authMiddleware';
+import { requireRole } from '../middleware/requireRole';
 
 const router = Router();
 
 const blockIpSchema = z.object({
-  ip: z.string().min(1, 'Target IP address is required'),
+  ip: z.string().ip({ message: 'Valid IPv4 or IPv6 target IP address is required' }),
   reason: z.string().optional(),
   actionType: z.enum(['BGP_FLOWSPEC', 'IPTABLES_DROP', 'QUARANTINE_VLAN']).optional(),
 });
@@ -43,8 +44,8 @@ function initMitigationTable() {
   }
 }
 
-// Get All Active Firewall & BGP Mitigation Rules
-router.get('/active-rules', (req: AuthenticatedRequest, res: Response) => {
+// Get All Active Firewall & BGP Mitigation Rules (Protected)
+router.get('/active-rules', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
     initMitigationTable();
     const rows = queryObjects('SELECT * FROM active_mitigations ORDER BY created_at DESC');
@@ -64,8 +65,8 @@ router.get('/active-rules', (req: AuthenticatedRequest, res: Response) => {
   }
 });
 
-// Trigger Automated IP Mitigation Block Action (Protected)
-router.post('/block-ip', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+// Trigger Automated IP Mitigation Block Action (Protected & RBAC Enforced)
+router.post('/block-ip', requireAuth, requireRole('Administrator', 'Analyst'), (req: AuthenticatedRequest, res: Response) => {
   const parseResult = blockIpSchema.safeParse(req.body);
   if (!parseResult.success) {
     const errorMsg = parseResult.error.errors[0]?.message || 'Invalid mitigation payload';

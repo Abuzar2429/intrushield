@@ -108,7 +108,8 @@ router.post('/register', (req: AuthenticatedRequest, res: Response) => {
 
     const userId = generateUUID();
     const passwordHash = hashPassword(password);
-    const userRole = role || 'Analyst';
+    // Enforce 'Analyst' role for public self-registration to prevent privilege escalation
+    const userRole = 'Analyst';
     const createdAt = new Date().toISOString();
 
     const db = getDb();
@@ -164,7 +165,7 @@ router.get('/profile', requireAuth, (req: AuthenticatedRequest, res: Response) =
   }
 });
 
-// Reset Password Endpoint
+// Reset Password Endpoint (Requires Authentication or Valid Password Verification)
 router.post('/reset-password', (req: AuthenticatedRequest, res: Response) => {
   const parseResult = resetPasswordSchema.safeParse(req.body);
   if (!parseResult.success) {
@@ -174,13 +175,40 @@ router.post('/reset-password', (req: AuthenticatedRequest, res: Response) => {
   }
 
   const { email, newPassword } = parseResult.data;
+  const currentPassword = req.body?.currentPassword;
+  const authHeader = req.headers.authorization;
 
   try {
     const cleanEmail = email.toLowerCase().trim();
-    const existing = queryObjects('SELECT id FROM users WHERE email = ?', [cleanEmail]);
+    const users = queryObjects('SELECT * FROM users WHERE email = ?', [cleanEmail]);
 
-    if (!existing.length) {
+    if (!users.length) {
       res.status(404).json({ error: 'Account with specified email not found.' });
+      return;
+    }
+
+    const userRow = users[0];
+
+    // Check authorization: Must either have valid Bearer token OR present matching currentPassword
+    let isAuthorized = false;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const decoded = req.user || verifyToken(authHeader.substring(7));
+      if (decoded && (decoded.email.toLowerCase() === cleanEmail || decoded.role === 'Administrator')) {
+        isAuthorized = true;
+      }
+    }
+
+    if (!isAuthorized && currentPassword) {
+      if (verifyPassword(currentPassword, userRow.password_hash)) {
+        isAuthorized = true;
+      }
+    }
+
+    if (!isAuthorized) {
+      res.status(401).json({
+        error: 'Authentication required. Missing Bearer token or invalid current password.'
+      });
       return;
     }
 

@@ -3,7 +3,7 @@ import type { Packet, PCAPAnalysisResult } from '../types/packet';
 import type { Incident } from '../types/incident';
 import { MOCK_PACKETS } from '../mock/packets';
 import { MOCK_INCIDENTS } from '../mock/incidents';
-import { incidentsApi, pcapApi } from '../services/apiClient';
+import { incidentsApi, pcapApi, getStoredToken } from '../services/apiClient';
 
 interface MonitoringContextType {
   packets: Packet[];
@@ -100,7 +100,8 @@ export const MonitoringProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     if (!isLiveStreaming) return;
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.hostname}:5000/ws`;
+    const token = getStoredToken();
+    const wsUrl = `${protocol}//${window.location.hostname}:5000/ws${token ? `?token=${encodeURIComponent(token)}` : ''}`;
     let socket: WebSocket | null = null;
 
     try {

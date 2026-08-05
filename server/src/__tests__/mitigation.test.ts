@@ -55,8 +55,10 @@ describe('ML Inference Engine & Mitigation REST API', () => {
   });
 
   describe('Mitigation REST API Endpoints', () => {
-    it('should fetch list of active mitigation rules', async () => {
-      const res = await request(app).get('/api/mitigation/active-rules');
+    it('should fetch list of active mitigation rules with valid auth token', async () => {
+      const res = await request(app)
+        .get('/api/mitigation/active-rules')
+        .set('Authorization', `Bearer ${authToken}`);
 
       expect(res.status).toBe(200);
       expect(Array.isArray(res.body.rules)).toBe(true);
@@ -77,6 +79,18 @@ describe('ML Inference Engine & Mitigation REST API', () => {
       expect(res.status).toBe(201);
       expect(res.body.rule).toHaveProperty('ipAddress', targetIp);
       expect(res.body.rule.ruleSyntax).toContain('flow route');
+    });
+
+    it('should reject invalid IP payloads to prevent command injection', async () => {
+      const res = await request(app)
+        .post('/api/mitigation/block-ip')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          ip: '10.0.0.1; reboot',
+          reason: 'Malicious payload injection test',
+        });
+
+      expect(res.status).toBe(400);
     });
 
     it('should reject IP mitigation request without authentication', async () => {

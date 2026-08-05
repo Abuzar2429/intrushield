@@ -14,8 +14,15 @@ describe('Incidents REST API Endpoints', () => {
     authToken = res.body.token;
   });
 
-  it('should fetch list of security incidents', async () => {
+  it('should reject fetching list of incidents without auth token', async () => {
     const res = await request(app).get('/api/incidents');
+    expect(res.status).toBe(401);
+  });
+
+  it('should fetch list of security incidents with valid auth token', async () => {
+    const res = await request(app)
+      .get('/api/incidents')
+      .set('Authorization', `Bearer ${authToken}`);
 
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.incidents)).toBe(true);
@@ -46,8 +53,10 @@ describe('Incidents REST API Endpoints', () => {
     createdIncidentId = res.body.incident.id;
   });
 
-  it('should fetch incident by ID', async () => {
-    const res = await request(app).get(`/api/incidents/${createdIncidentId}`);
+  it('should fetch incident by ID with auth token', async () => {
+    const res = await request(app)
+      .get(`/api/incidents/${createdIncidentId}`)
+      .set('Authorization', `Bearer ${authToken}`);
 
     expect(res.status).toBe(200);
     expect(res.body.incident.id).toBe(createdIncidentId);
@@ -63,8 +72,10 @@ describe('Incidents REST API Endpoints', () => {
     expect(res.body.incident.status).toBe('Resolved');
   });
 
-  it('should return 404 for non-existent incident ID', async () => {
-    const res = await request(app).get('/api/incidents/NON_EXISTENT_999');
+  it('should return 404 for non-existent incident ID with auth token', async () => {
+    const res = await request(app)
+      .get('/api/incidents/NON_EXISTENT_999')
+      .set('Authorization', `Bearer ${authToken}`);
 
     expect(res.status).toBe(404);
   });

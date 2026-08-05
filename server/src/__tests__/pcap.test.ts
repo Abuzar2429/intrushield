@@ -1,13 +1,23 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import request from 'supertest';
 import { app } from '../server';
 
 describe('PCAP Analysis REST API Endpoints', () => {
-  it('should process PCAP file upload and return classification results', async () => {
+  let authToken: string;
+
+  beforeAll(async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'admin@intrushield.io', password: 'Admin@12345' });
+    authToken = res.body.token;
+  });
+
+  it('should process PCAP file upload and return classification results with auth token', async () => {
     const dummyBuffer = Buffer.from('DUMMY_PCAP_PACKET_DATA_HEADER');
 
     const res = await request(app)
       .post('/api/pcap/upload')
+      .set('Authorization', `Bearer ${authToken}`)
       .attach('file', dummyBuffer, 'sample_traffic.pcap');
 
     expect(res.status).toBe(201);
@@ -16,8 +26,10 @@ describe('PCAP Analysis REST API Endpoints', () => {
     expect(res.body.scan).toHaveProperty('attackProbability');
   });
 
-  it('should fetch history of PCAP scans', async () => {
-    const res = await request(app).get('/api/pcap/scans');
+  it('should fetch history of PCAP scans with auth token', async () => {
+    const res = await request(app)
+      .get('/api/pcap/scans')
+      .set('Authorization', `Bearer ${authToken}`);
 
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body.scans)).toBe(true);
