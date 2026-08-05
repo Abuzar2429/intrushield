@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card } from '../components/common/Card';
 import { Badge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
-import { UserCheck, Shield, Key, Lock, CheckCircle2, Award, Terminal, LogOut } from 'lucide-react';
+import { UserCheck, Shield, Lock, CheckCircle2, Award, Terminal, LogOut } from 'lucide-react';
 import { getStoredUser, authApi } from '../services/apiClient';
 import { useNavigate } from 'react-router-dom';
 
