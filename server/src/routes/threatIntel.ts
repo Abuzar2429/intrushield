@@ -27,7 +27,11 @@ function queryObjects(sql: string, params: any[] = []): Record<string, any>[] {
   return rows;
 }
 
-// Get All Threat Intel IOCs (Protected)
+/**
+ * @route GET /api/threat-intel
+ * @desc Fetch threat intelligence indicators of compromise (IOCs)
+ * @access Private (Requires Auth Token)
+ */
 router.get('/', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
     const { query, type, riskLevel } = req.query;
