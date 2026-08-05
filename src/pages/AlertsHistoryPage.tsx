@@ -3,7 +3,7 @@ import { Card } from '../components/common/Card';
 import { Badge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
 import { SearchInput } from '../components/common/SearchInput';
-import { AlertOctagon, Filter, CheckCircle2, ShieldAlert, Download, Clock } from 'lucide-react';
+import { AlertOctagon, Filter, CheckCircle2, Download, Clock } from 'lucide-react';
 import { useMonitoring } from '../context/MonitoringContext';
 
 export const AlertsHistoryPage: React.FC = () => {
