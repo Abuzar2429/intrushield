@@ -71,7 +71,7 @@ app.get('/api/health', (req: Request, res: Response) => {
         threatIntelCount: threatCount
       }
     });
-  } catch (err: any) {
+  } catch (_err: any) {
     res.status(500).json({
       status: 'error',
       service: 'IntruShield NIDS Core Engine',
@@ -87,7 +87,7 @@ const server = http.createServer(app);
 setupLiveStreamWebSocket(server);
 
 // Global Error Handler
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   console.error('[SERVER ERROR]', err);
   const status = err.status || 500;
   const message = process.env.NODE_ENV === 'production' && status === 500
