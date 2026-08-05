@@ -39,7 +39,7 @@ function initMitigationTable() {
         created_at TEXT NOT NULL
       );
     `);
-  } catch (err) {
+  } catch (_err) {
     // Ignore if table init fails before DB ready
   }
 }
