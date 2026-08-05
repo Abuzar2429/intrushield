@@ -19,7 +19,11 @@ function queryObjects(sql: string, params: any[] = []): Record<string, any>[] {
   return rows;
 }
 
-// Get All Historical PCAP Scans (Protected)
+/**
+ * @route GET /api/pcap/scans
+ * @desc Fetch historical PCAP analysis scans
+ * @access Private (Requires Auth Token)
+ */
 router.get('/scans', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
     const rows = queryObjects('SELECT * FROM pcap_scans ORDER BY created_at DESC');
