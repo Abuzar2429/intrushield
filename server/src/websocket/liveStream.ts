@@ -84,7 +84,7 @@ export function setupLiveStreamWebSocket(server: HttpServer) {
     });
   });
 
-  const interval = setInterval(() => {
+  setInterval(() => {
     if (!isStreaming || wss.clients.size === 0) return;
 
     const packet = generateRandomPacket();
