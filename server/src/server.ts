@@ -13,14 +13,28 @@ import mitigationRouter from './routes/mitigation';
 
 import { auditLogger } from './middleware/auditLogger';
 import { setupLiveStreamWebSocket } from './websocket/liveStream';
+import { apiRateLimiter } from './middleware/rateLimiter';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Express Middleware Hardening
-app.use(helmet());
+// Express Middleware Security Hardening
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      connectSrc: ["'self'", "ws:", "wss:"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+  referrerPolicy: { policy: 'same-origin' },
+}));
+
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, curl, same-origin) or matching host
@@ -35,7 +49,7 @@ app.use(cors({
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(auditLogger);
-
+app.use('/api', apiRateLimiter);
 
 // API Routes
 app.use('/api/auth', authRouter);
