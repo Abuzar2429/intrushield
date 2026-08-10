@@ -4,10 +4,8 @@ import { Badge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
 import { SearchInput } from '../components/common/SearchInput';
 import { AlertOctagon, Filter, CheckCircle2, Download, Clock } from 'lucide-react';
-import { useMonitoring } from '../context/MonitoringContext';
 
 export const AlertsHistoryPage: React.FC = () => {
-  const { incidents } = useMonitoring();
   const [searchTerm, setSearchTerm] = useState('');
   const [severityFilter, setSeverityFilter] = useState('ALL');
 
