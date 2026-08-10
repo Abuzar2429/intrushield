@@ -2,7 +2,8 @@ import { Router, Response } from 'express';
 import { z } from 'zod';
 import { getDb, saveDb } from '../db/database';
 import { hashPassword, verifyPassword, generateUUID } from '../utils/cryptoUtils';
-import { generateToken, requireAuth, AuthenticatedRequest } from '../middleware/authMiddleware';
+import { generateToken, verifyToken, requireAuth, AuthenticatedRequest } from '../middleware/authMiddleware';
+import { authRateLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
 
@@ -42,7 +43,7 @@ function queryObjects(sql: string, params: any[] = []): Record<string, any>[] {
  * @desc Authenticate user credentials and return JWT bearer token
  * @access Public
  */
-router.post('/login', (req: AuthenticatedRequest, res: Response) => {
+router.post('/login', authRateLimiter, (req: AuthenticatedRequest, res: Response) => {
   const parseResult = loginSchema.safeParse(req.body);
   if (!parseResult.success) {
     const errorMsg = parseResult.error.errors[0]?.message || 'Invalid input';
@@ -91,7 +92,7 @@ router.post('/login', (req: AuthenticatedRequest, res: Response) => {
 });
 
 // Register Endpoint
-router.post('/register', (req: AuthenticatedRequest, res: Response) => {
+router.post('/register', authRateLimiter, (req: AuthenticatedRequest, res: Response) => {
   const parseResult = registerSchema.safeParse(req.body);
   if (!parseResult.success) {
     const errorMsg = parseResult.error.errors[0]?.message || 'Invalid input';
@@ -170,7 +171,7 @@ router.get('/profile', requireAuth, (req: AuthenticatedRequest, res: Response) =
 });
 
 // Reset Password Endpoint (Requires Authentication or Valid Password Verification)
-router.post('/reset-password', (req: AuthenticatedRequest, res: Response) => {
+router.post('/reset-password', authRateLimiter, (req: AuthenticatedRequest, res: Response) => {
   const parseResult = resetPasswordSchema.safeParse(req.body);
   if (!parseResult.success) {
     const errorMsg = parseResult.error.errors[0]?.message || 'Invalid input';
