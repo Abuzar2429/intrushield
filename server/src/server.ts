@@ -62,22 +62,8 @@ app.use('/api/pcap', pcapRouter);
 app.use('/api/mitigation', mitigationRouter);
 app.use('/api/users', usersRouter);
 
-// Serve unified static React frontend SPA if dist folder exists
-const clientDistPath = path.join(__dirname, '../../dist');
-if (fs.existsSync(clientDistPath)) {
-  app.use(express.static(clientDistPath));
-  app.get('*', (req: Request, res: Response, next: NextFunction) => {
-    if (req.path.startsWith('/api') || req.path.startsWith('/ws')) {
-      next();
-      return;
-    }
-    res.sendFile(path.join(clientDistPath, 'index.html'));
-  });
-}
-
-
-// Health check endpoint
-app.get('/api/health', (req: Request, res: Response) => {
+// Health check endpoints (Placed before SPA catch-all fallback)
+const handleHealthCheck = (_req: Request, res: Response) => {
   try {
     const db = getDb();
     const userRes = db.exec('SELECT COUNT(*) as count FROM users');
@@ -109,7 +95,23 @@ app.get('/api/health', (req: Request, res: Response) => {
       error: 'Health check failed'
     });
   }
-});
+};
+
+app.get('/api/health', handleHealthCheck);
+app.get('/health', handleHealthCheck);
+
+// Serve unified static React frontend SPA if dist folder exists
+const clientDistPath = path.join(__dirname, '../../dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  app.get('*', (req: Request, res: Response, next: NextFunction) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/ws')) {
+      next();
+      return;
+    }
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+}
 
 // Create HTTP server
 const server = http.createServer(app);

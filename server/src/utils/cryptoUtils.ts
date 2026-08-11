@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import crypto from 'node:crypto';
+import crypto from 'crypto';
 
 /**
  * Hash a password using industry-standard bcrypt library.
