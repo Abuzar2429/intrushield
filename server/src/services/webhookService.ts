@@ -16,6 +16,8 @@ export interface AlertWebhookPayload {
 /**
  * Dispatches an automated security incident alert payload to an external webhook endpoint.
  * Configured via WEBHOOK_ALERT_URL environment variable or fallback endpoint.
+ * @param payload Formatted threat alert payload containing incident ID, threat score, and mitigation recommendation
+ * @returns Promise resolving to boolean indicating successful HTTP delivery
  */
 export async function dispatchAlertWebhook(payload: AlertWebhookPayload): Promise<boolean> {
   const webhookUrl = process.env.WEBHOOK_ALERT_URL;
