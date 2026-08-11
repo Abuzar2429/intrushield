@@ -4,7 +4,11 @@ import fs from 'fs';
 import { hashPassword, generateUUID } from '../utils/cryptoUtils';
 
 
-const dbFilePath = path.join(__dirname, '../../intrushield.sqlite');
+const dbFilePath = process.env.DATABASE_PATH || path.join(__dirname, '../../intrushield.sqlite');
+const dbDir = path.dirname(dbFilePath);
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+}
 
 let db: SqlJsDatabase;
 
