@@ -10,6 +10,9 @@ export interface EnrichedThreatMetadata {
 
 /**
  * Enriches Indicator of Compromise (IOC) records with risk scoring & threat categorization.
+ * @param ioc Raw Indicator of Compromise string (IP address, domain, or file hash)
+ * @param type IOC category type
+ * @returns Structured EnrichedThreatMetadata object with risk score and associated threat actors
  */
 export function enrichIOCData(ioc: string, type: 'IPv4' | 'IPv6' | 'Domain' | 'Hash'): EnrichedThreatMetadata {
   const clean = ioc.trim().toLowerCase();
