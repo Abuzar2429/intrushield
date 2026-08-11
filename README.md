@@ -1,11 +1,34 @@
 # 🛡️ IntruShield — Enterprise AI Network Intrusion Detection System (NIDS)
 
-![IntruShield Security Architecture](https://img.shields.io/badge/Security-Hardened-emerald?style=for-the-badge&logo=shield)
+![IntruShield Security Hardened](https://img.shields.io/badge/Security-Hardened-emerald?style=for-the-badge&logo=shield)
 ![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge&logo=github)
-![Test Coverage](https://img.shields.io/badge/Tests-24%2F24%20Passed-blue?style=for-the-badge&logo=vitest)
+![Test Coverage](https://img.shields.io/badge/Tests-34%2F34%20Passed-blue?style=for-the-badge&logo=vitest)
 ![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)
 
-**IntruShield** is a state-of-the-art Next-Generation Network Intrusion Detection System (NIDS) and Security Operations Center (SOC) dashboard. It combines real-time packet stream telemetry, machine learning anomaly detection models, SHAP explainable AI vectors, and automated BGP Flowspec & `iptables` firewall mitigation.
+---
+
+### 🌐 Live Online Demo (No Download Required)
+Click the link below to access and test the live application directly in your web browser:
+
+👉 **[https://intrushield.onrender.com](https://intrushield.onrender.com)**
+
+#### 🔑 Demo Login Credentials
+- **Lead Administrator Email:** `admin@intrushield.io`
+- **Password:** `Admin@12345`
+*(Or click **Register** on the login page to create your own account)*
+
+---
+
+## 💡 What is IntruShield? (In Simple Terms)
+
+Imagine **IntruShield** as an **AI-powered digital security guard** for computer networks.
+
+Just like a home security system monitors who enters a building and alerts you if someone tries to break a window or pick a lock, **IntruShield constantly watches internet traffic entering a company's computers**:
+
+- 🚨 **Catches Hackers Automatically:** Smart Artificial Intelligence (AI) instantly detects cybercriminals trying to crash servers, guess passwords, or steal data.
+- 🗣️ **Explains Threats Simply:** Instead of displaying confusing technical jargon, it explains *why* an alert was triggered in plain, easy-to-understand English.
+- 🛑 **Blocks Attacks Instantly:** It can automatically block malicious attackers and suspicious IP addresses before they cause any harm.
+- 📱 **Zero Setup Needed:** Anyone can access the full system live from their phone, tablet, or laptop without downloading or installing any software!
 
 ---
 
@@ -17,17 +40,19 @@
 
 ---
 
-## ⚡ Key Features
+## ⚡ Key Technical Features
 
 - **🧠 ML Anomaly & Attack Classification:** Real-time Random Forest ensemble models evaluating SYN floods, SSH brute-force probes, DNS tunneling, and SQL injection payloads.
 - **📊 SHAP Explainable AI (XAI):** Natural language reasoning and feature importance vectors for SOC analysts.
+- **👥 SOC Team Governance:** Dedicated user administration portal (`/users`) to manage security analyst permissions and roles (`Administrator`, `Analyst`, `Auditor`).
+- **🔔 Real-Time Webhook Alert Dispatch:** Automated notification pipeline dispatching critical threat payloads to external Slack, Discord, or PagerDuty webhooks.
 - **🔒 Hardened Enterprise Security Architecture:**
   - **Cryptographic JWT Authentication:** Secure token validation for all operational API endpoints and live WebSocket streams.
-  - **Role-Based Access Control (RBAC):** Strict role enforcement (`Administrator`, `Analyst`) protecting sensitive actions such as IOC deletion and firewall mitigation enforcement.
-  - **Input Sanitization & Injection Defense:** Zod-validated IPv4/IPv6 address schemas preventing command injection in firewall rule generators.
-  - **Helmet & CORS Security:** CSP headers, restricted origins, and request body size limits to prevent DoS attacks.
-- **📡 Real-Time Telemetry Stream:** Low-latency WebSocket broadcasting (`ws://.../ws`) delivering authenticated packet logs and instant critical alert popups.
-- **💾 SQLite WASM Database:** Persistent zero-dependency database snapshot engine powered by `sql.js`.
+  - **Role-Based Access Control (RBAC):** Strict role enforcement protecting sensitive actions such as user governance and firewall mitigation enforcement.
+  - **Rate Limiting & DoS Protection:** Sliding window IP rate limiters on authentication endpoints to stop brute-force login attempts.
+  - **Helmet & CORS Security:** CSP headers, restricted origins, and body size limits.
+- **📡 Real-Time Telemetry Stream:** Low-latency WebSocket broadcasting (`/ws`) delivering authenticated packet logs and instant critical alert popups.
+- **💾 SQLite WASM Database:** Persistent database snapshot engine powered by `sql.js`.
 
 ---
 
@@ -35,21 +60,24 @@
 
 ```
 intrushield/
+├── .github/workflows/         # Automated GitHub Actions CI pipeline (ci.yml)
 ├── server/                    # Node.js + Express + TypeScript Backend
 │   ├── src/
 │   │   ├── db/                # SQLite WASM database initialization & snapshotting
-│   │   ├── middleware/        # JWT Auth & RBAC (requireAuth, requireRole, auditLogger)
-│   │   ├── ml/                # Network flow inference engine & feature extractions
-│   │   ├── routes/            # REST API endpoints (auth, incidents, threatIntel, pcap, mitigation)
+│   │   ├── middleware/        # JWT Auth, RBAC & Rate Limiter (requireAuth, rateLimiter)
+│   │   ├── routes/            # REST API endpoints (auth, incidents, threatIntel, pcap, mitigation, users)
+│   │   ├── services/          # Real-time Webhook alert dispatch & threat enrichment
 │   │   ├── websocket/         # Authenticated live telemetry streaming (/ws)
-│   │   └── __tests__/         # Vitest test suite for Express endpoints & security
+│   │   └── __tests__/         # Vitest test suites (34 passed tests)
 ├── src/                       # React 19 + TypeScript + Vite Frontend
 │   ├── components/            # Reusable UI components & SOC layout
 │   ├── context/               # MonitoringContext & ThemeContext
-│   ├── pages/                 # SOC views (Dashboard, Incident Details, Threat Intel, PCAP)
+│   ├── pages/                 # SOC views (Dashboard, Incident Details, Users Governance, PCAP)
 │   └── services/              # API client & JWT token management
+├── Dockerfile                 # Unified fullstack production container build
+├── docker-compose.yml         # Container orchestrator with volume mounts
 ├── package.json               # Root dependencies & test scripts
-└── README.md                  # System documentation
+└── README.md                  # Project documentation
 ```
 
 ---
@@ -59,21 +87,21 @@ intrushield/
 | Component | Protection Mechanism | Status |
 | :--- | :--- | :--- |
 | **Authentication** | 24-hour signed JWT tokens with scrypt/bcrypt password hashing | ✅ Enforced |
-| **Authorization** | `requireRole('Administrator')` for destructive actions (IOC delete, block IP) | ✅ Enforced |
-| **Input Validation** | Zod `z.string().ip()` validation on firewall endpoints | ✅ Enforced |
+| **Authorization** | `requireRole('Administrator')` for administrative actions (user roles, IP blocks) | ✅ Enforced |
+| **Rate Limiting** | 10 attempts / 15 min on auth routes, 100 req / min on general APIs | ✅ Enforced |
+| **Input Validation** | Zod `z.string().ip()` validation on firewall & auth endpoints | ✅ Enforced |
 | **WebSocket Security** | Authenticated token handshake on `/ws?token=<jwt>` | ✅ Enforced |
-| **Server Security** | Helmet HTTP security headers, CORS origin restrictions, 1MB body limits | ✅ Enforced |
-| **Password Reset** | Authenticated or current password validated password updates | ✅ Enforced |
+| **Server Security** | Helmet HTTP security headers, CORS origin restrictions, body limits | ✅ Enforced |
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Local Development Setup
 
 ### Prerequisites
 - **Node.js**: v18.0.0 or higher
 - **npm**: v9.0.0 or higher
 
-### Installation
+### Running Locally
 
 1. **Clone the Repository:**
    ```bash
@@ -81,31 +109,21 @@ intrushield/
    cd intrushield
    ```
 
-2. **Install Frontend Dependencies:**
+2. **Install Dependencies:**
    ```bash
-   npm install
+   npm install && npm --prefix server install
    ```
 
-3. **Install Backend Dependencies:**
-   ```bash
-   cd server
-   npm install
-   cd ..
-   ```
-
-### Running the Application
-
-1. **Start the Backend Server (Port 5000):**
-   ```bash
-   npm --prefix server run dev
-   ```
-
-2. **Start the Frontend Dev Server (Port 5173):**
+3. **Start Development Application:**
    ```bash
    npm run dev
    ```
 
-3. Open `http://localhost:5173` in your browser.
+4. **Build & Start Unified Production Server Locally:**
+   ```bash
+   npm run build
+   npm start
+   ```
 
 ---
 
@@ -114,32 +132,17 @@ intrushield/
 Run the comprehensive unit and security test suites:
 
 ```bash
-# Run backend Express test suite (Vitest)
-npm --prefix server test
-
-# Run frontend React test suite (Vitest)
-npm test
-
-# Run all test suites
+# Run all test suites across frontend and backend
 npm run test:all
 
-# Run code linter
+# Run linter
 npm run lint
 ```
 
-### Test Output Verification
+### Test Suite Output Verification
 ```
- RUN  v4.1.10 C:/Users/Ashraf/.gemini/antigravity-ide/scratch/intrushield/server
-
- ✓ src/__tests__/health.test.ts (1 test)
- ✓ src/__tests__/threatIntel.test.ts (3 tests)
- ✓ src/__tests__/pcap.test.ts (2 tests)
- ✓ src/__tests__/incidents.test.ts (6 tests)
- ✓ src/__tests__/mitigation.test.ts (6 tests)
- ✓ src/__tests__/auth.test.ts (6 tests)
-
- Test Files  6 passed (6)
-      Tests  24 passed (24)
+ Test Files  9 passed (9)
+      Tests  34 passed (34)
 ```
 
 ---
