@@ -23,8 +23,20 @@ function queryObjects(sql: string, params: any[] = []): Record<string, any>[] {
 }
 
 /**
- * GET /api/users
- * Fetch list of all registered security team users. Restricted to Administrators.
+ * @openapi
+ * /api/users:
+ *   get:
+ *     summary: Fetch list of security team users
+ *     tags: [Users Admin]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of registered SOC users and total count
+ *       401:
+ *         description: Authentication token missing or invalid
+ *       403:
+ *         description: Administrator privileges required
  */
 router.get('/', requireAuth, requireRole('Administrator'), (_req: AuthenticatedRequest, res: Response) => {
   try {
