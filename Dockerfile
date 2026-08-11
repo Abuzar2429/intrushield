@@ -1,40 +1,26 @@
 # =========================================================
-# Stage 1: Build React Production Distribution Assets
+# IntruShield Unified Production Container (Node.js + React + Express)
 # =========================================================
-FROM node:20-alpine AS builder
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package manifests & install dependencies
+# Copy root and server package manifests & install dependencies
 COPY package*.json ./
-RUN npm ci
+COPY server/package*.json ./server/
+RUN npm ci && npm --prefix server ci
 
-# Copy source code and configuration files
-COPY tsconfig*.json ./
-COPY vite.config.ts ./
-COPY postcss.config.js ./
-COPY tailwind.config.js ./
-COPY index.html ./
-COPY public ./public
-COPY src ./src
+# Copy full repository source code
+COPY . .
 
-# Build production bundle
+# Build React frontend SPA and compile Express server TypeScript
 RUN npm run build
 
-# =========================================================
-# Stage 2: Serve Bundle via Nginx Reverse Proxy
-# =========================================================
-FROM nginx:1.25-alpine AS runner
+# Environment defaults
+ENV NODE_ENV=production
+ENV PORT=5000
 
-# Remove default Nginx site static files
-RUN rm -rf /usr/share/nginx/html/*
+EXPOSE 5000
 
-# Copy custom Nginx proxy configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Copy compiled static site output from builder
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+# Start unified Node server serving frontend SPA & backend REST API / WebSockets
+CMD ["npm", "start"]
