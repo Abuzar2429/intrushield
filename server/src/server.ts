@@ -3,6 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import http from 'http';
+import path from 'path';
+import fs from 'fs';
 import { getDb, initDatabase, saveDb } from './db/database';
 
 import authRouter from './routes/auth';
@@ -59,6 +61,19 @@ app.use('/api/threat-intel', threatIntelRouter);
 app.use('/api/pcap', pcapRouter);
 app.use('/api/mitigation', mitigationRouter);
 app.use('/api/users', usersRouter);
+
+// Serve unified static React frontend SPA if dist folder exists
+const clientDistPath = path.join(__dirname, '../../dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  app.get('*', (req: Request, res: Response, next: NextFunction) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/ws')) {
+      next();
+      return;
+    }
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+}
 
 
 // Health check endpoint
