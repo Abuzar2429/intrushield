@@ -23,6 +23,7 @@ import { AnalyticsPage } from './pages/AnalyticsPage';
 import { ModelsPage } from './pages/ModelsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { UsersAdminPage } from './pages/UsersAdminPage';
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
               <Route path="/reports" element={<ReportsPage />} />
               <Route path="/analytics" element={<AnalyticsPage />} />
               <Route path="/models" element={<ModelsPage />} />
+              <Route path="/users" element={<UsersAdminPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/profile" element={<ProfilePage />} />
             </Route>

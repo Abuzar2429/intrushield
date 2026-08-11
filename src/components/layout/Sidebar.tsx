@@ -42,6 +42,7 @@ export const Sidebar: React.FC = () => {
     { name: 'Reports', path: '/reports', icon: <FileText className="w-4 h-4" /> },
     { name: 'Analytics', path: '/analytics', icon: <BarChart3 className="w-4 h-4" /> },
     { name: 'Models & Governance', path: '/models', icon: <Layers className="w-4 h-4" /> },
+    { name: 'Team Governance', path: '/users', icon: <UserCheck className="w-4 h-4" /> },
     { name: 'Settings', path: '/settings', icon: <Settings className="w-4 h-4" /> },
     { name: 'Analyst Profile', path: '/profile', icon: <UserCheck className="w-4 h-4" /> },
   ];
