@@ -1,0 +1,2215 @@
+{
+  "metadata": {
+    "model_name": "IntruShield Random Forest CIC-IDS Classifier",
+    "version": "2.0.0",
+    "num_trees": 10,
+    "feature_names": [
+      "flowDurationMs",
+      "totalFwdPackets",
+      "totalBwdPackets",
+      "flowBytesPerSec",
+      "flowPacketsPerSec",
+      "synFlagCount",
+      "ackFlagCount",
+      "payloadEntropy",
+      "averagePacketSizeBytes",
+      "synRatio",
+      "asymmetricRatio"
+    ],
+    "target_classes": [
+      "Benign Traffic Baseline",
+      "Volumetric SYN Flood DDoS",
+      "SSH Brute-Force Reconnaissance",
+      "DNS Tunneling Data Exfiltration",
+      "Stealth TCP SYN Port Sweep"
+    ],
+    "trained_samples_count": 1250
+  },
+  "feature_importances": {
+    "flowDurationMs": 0.0384,
+    "totalFwdPackets": 0.0458,
+    "totalBwdPackets": 0.0772,
+    "flowBytesPerSec": 0.1038,
+    "flowPacketsPerSec": 0.0886,
+    "synFlagCount": 0.0475,
+    "ackFlagCount": 0.0984,
+    "payloadEntropy": 0.1949,
+    "averagePacketSizeBytes": 0.1221,
+    "synRatio": 0.1786,
+    "asymmetricRatio": 0.0047
+  },
+  "trees": [
+    {
+      "is_leaf": false,
+      "feature": "payloadEntropy",
+      "threshold": 7.32115,
+      "gain": 0.19845,
+      "left": {
+        "is_leaf": false,
+        "feature": "averagePacketSizeBytes",
+        "threshold": 126.79223,
+        "gain": 0.24606,
+        "left": {
+          "is_leaf": false,
+          "feature": "flowPacketsPerSec",
+          "threshold": 22301.62101,
+          "gain": 0.47581,
+          "left": {
+            "is_leaf": false,
+            "feature": "flowBytesPerSec",
+            "threshold": 212731.12171,
+            "gain": 0.03512,
+            "left": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 240
+              },
+              "samples": 240,
+              "predicted_class": "Stealth TCP SYN Port Sweep"
+            },
+            "right": {
+              "is_leaf": false,
+              "feature": "flowDurationMs",
+              "threshold": 1155.25765,
+              "gain": 0.375,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 2
+                },
+                "samples": 2,
+                "predicted_class": "Stealth TCP SYN Port Sweep"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 6,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 6,
+                "predicted_class": "Volumetric SYN Flood DDoS"
+              },
+              "samples": 8
+            },
+            "samples": 248
+          },
+          "right": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 0,
+              "Volumetric SYN Flood DDoS": 236,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 0,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 236,
+            "predicted_class": "Volumetric SYN Flood DDoS"
+          },
+          "samples": 484
+        },
+        "right": {
+          "is_leaf": false,
+          "feature": "flowBytesPerSec",
+          "threshold": 391198.59458,
+          "gain": 0.46195,
+          "left": {
+            "is_leaf": false,
+            "feature": "totalBwdPackets",
+            "threshold": 400,
+            "gain": 0.05636,
+            "left": {
+              "is_leaf": false,
+              "feature": "flowBytesPerSec",
+              "threshold": 45184.97987,
+              "gain": 0.00055,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 233,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 233,
+                "predicted_class": "SSH Brute-Force Reconnaissance"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 1,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 13,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 14,
+                "predicted_class": "SSH Brute-Force Reconnaissance"
+              },
+              "samples": 247
+            },
+            "right": {
+              "is_leaf": false,
+              "feature": "averagePacketSizeBytes",
+              "threshold": 712.67209,
+              "gain": 0.32,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 1,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 4,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 5,
+                "predicted_class": "DNS Tunneling Data Exfiltration"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 5,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 5,
+                "predicted_class": "Benign Traffic Baseline"
+              },
+              "samples": 10
+            },
+            "samples": 257
+          },
+          "right": {
+            "is_leaf": false,
+            "feature": "synFlagCount",
+            "threshold": 264417,
+            "gain": 0.00763,
+            "left": {
+              "is_leaf": false,
+              "feature": "averagePacketSizeBytes",
+              "threshold": 127.7301,
+              "gain": 0.00772,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 1,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 1,
+                "predicted_class": "Volumetric SYN Flood DDoS"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 257,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 257,
+                "predicted_class": "Benign Traffic Baseline"
+              },
+              "samples": 258
+            },
+            "right": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 1,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 1,
+              "predicted_class": "Volumetric SYN Flood DDoS"
+            },
+            "samples": 259
+          },
+          "samples": 516
+        },
+        "samples": 1000
+      },
+      "right": {
+        "is_leaf": true,
+        "value": {
+          "Benign Traffic Baseline": 0,
+          "Volumetric SYN Flood DDoS": 0,
+          "SSH Brute-Force Reconnaissance": 0,
+          "DNS Tunneling Data Exfiltration": 250,
+          "Stealth TCP SYN Port Sweep": 0
+        },
+        "samples": 250,
+        "predicted_class": "DNS Tunneling Data Exfiltration"
+      },
+      "samples": 1250
+    },
+    {
+      "is_leaf": false,
+      "feature": "synRatio",
+      "threshold": 0.31146,
+      "gain": 0.19539,
+      "left": {
+        "is_leaf": false,
+        "feature": "payloadEntropy",
+        "threshold": 6.17882,
+        "gain": 0.47865,
+        "left": {
+          "is_leaf": false,
+          "feature": "synFlagCount",
+          "threshold": 297,
+          "gain": 0.01899,
+          "left": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 232,
+              "Volumetric SYN Flood DDoS": 0,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 0,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 232,
+            "predicted_class": "Benign Traffic Baseline"
+          },
+          "right": {
+            "is_leaf": false,
+            "feature": "synRatio",
+            "threshold": 0.09898,
+            "gain": 0.46537,
+            "left": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 12,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 12,
+              "predicted_class": "Benign Traffic Baseline"
+            },
+            "right": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 7,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 7,
+              "predicted_class": "SSH Brute-Force Reconnaissance"
+            },
+            "samples": 19
+          },
+          "samples": 251
+        },
+        "right": {
+          "is_leaf": false,
+          "feature": "synRatio",
+          "threshold": 0.03778,
+          "gain": 0.01575,
+          "left": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 2,
+              "Volumetric SYN Flood DDoS": 0,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 0,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 2,
+            "predicted_class": "Benign Traffic Baseline"
+          },
+          "right": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 0,
+              "Volumetric SYN Flood DDoS": 0,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 250,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 250,
+            "predicted_class": "DNS Tunneling Data Exfiltration"
+          },
+          "samples": 252
+        },
+        "samples": 503
+      },
+      "right": {
+        "is_leaf": false,
+        "feature": "averagePacketSizeBytes",
+        "threshold": 132.17506,
+        "gain": 0.31497,
+        "left": {
+          "is_leaf": false,
+          "feature": "totalFwdPackets",
+          "threshold": 2952,
+          "gain": 0.47686,
+          "left": {
+            "is_leaf": false,
+            "feature": "synRatio",
+            "threshold": 0.32006,
+            "gain": 0.00749,
+            "left": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 1,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 1,
+              "predicted_class": "SSH Brute-Force Reconnaissance"
+            },
+            "right": {
+              "is_leaf": false,
+              "feature": "totalBwdPackets",
+              "threshold": 99,
+              "gain": 0.00106,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 256
+                },
+                "samples": 256,
+                "predicted_class": "Stealth TCP SYN Port Sweep"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 1,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 6
+                },
+                "samples": 7,
+                "predicted_class": "Stealth TCP SYN Port Sweep"
+              },
+              "samples": 263
+            },
+            "samples": 264
+          },
+          "right": {
+            "is_leaf": false,
+            "feature": "flowPacketsPerSec",
+            "threshold": 466.81294,
+            "gain": 0.0228,
+            "left": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 3
+              },
+              "samples": 3,
+              "predicted_class": "Stealth TCP SYN Port Sweep"
+            },
+            "right": {
+              "is_leaf": false,
+              "feature": "ackFlagCount",
+              "threshold": 168,
+              "gain": 0.01569,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 2
+                },
+                "samples": 2,
+                "predicted_class": "Stealth TCP SYN Port Sweep"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 251,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 251,
+                "predicted_class": "Volumetric SYN Flood DDoS"
+              },
+              "samples": 253
+            },
+            "samples": 256
+          },
+          "samples": 520
+        },
+        "right": {
+          "is_leaf": true,
+          "value": {
+            "Benign Traffic Baseline": 0,
+            "Volumetric SYN Flood DDoS": 0,
+            "SSH Brute-Force Reconnaissance": 227,
+            "DNS Tunneling Data Exfiltration": 0,
+            "Stealth TCP SYN Port Sweep": 0
+          },
+          "samples": 227,
+          "predicted_class": "SSH Brute-Force Reconnaissance"
+        },
+        "samples": 747
+      },
+      "samples": 1250
+    },
+    {
+      "is_leaf": false,
+      "feature": "synRatio",
+      "threshold": 0.19698,
+      "gain": 0.20022,
+      "left": {
+        "is_leaf": false,
+        "feature": "payloadEntropy",
+        "threshold": 6.11895,
+        "gain": 0.46956,
+        "left": {
+          "is_leaf": true,
+          "value": {
+            "Benign Traffic Baseline": 255,
+            "Volumetric SYN Flood DDoS": 0,
+            "SSH Brute-Force Reconnaissance": 0,
+            "DNS Tunneling Data Exfiltration": 0,
+            "Stealth TCP SYN Port Sweep": 0
+          },
+          "samples": 255,
+          "predicted_class": "Benign Traffic Baseline"
+        },
+        "right": {
+          "is_leaf": false,
+          "feature": "flowBytesPerSec",
+          "threshold": 862551.40396,
+          "gain": 0.04455,
+          "left": {
+            "is_leaf": false,
+            "feature": "payloadEntropy",
+            "threshold": 6.12322,
+            "gain": 0.01569,
+            "left": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 2,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 2,
+              "predicted_class": "Benign Traffic Baseline"
+            },
+            "right": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 251,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 251,
+              "predicted_class": "DNS Tunneling Data Exfiltration"
+            },
+            "samples": 253
+          },
+          "right": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 6,
+              "Volumetric SYN Flood DDoS": 0,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 0,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 6,
+            "predicted_class": "Benign Traffic Baseline"
+          },
+          "samples": 259
+        },
+        "samples": 514
+      },
+      "right": {
+        "is_leaf": false,
+        "feature": "flowPacketsPerSec",
+        "threshold": 26905.80044,
+        "gain": 0.29787,
+        "left": {
+          "is_leaf": false,
+          "feature": "averagePacketSizeBytes",
+          "threshold": 79.87069,
+          "gain": 0.45947,
+          "left": {
+            "is_leaf": false,
+            "feature": "flowPacketsPerSec",
+            "threshold": 17944.85319,
+            "gain": 0.06144,
+            "left": {
+              "is_leaf": false,
+              "feature": "synFlagCount",
+              "threshold": 2429,
+              "gain": 0.00115,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 235
+                },
+                "samples": 235,
+                "predicted_class": "Stealth TCP SYN Port Sweep"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 1,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 6
+                },
+                "samples": 7,
+                "predicted_class": "Stealth TCP SYN Port Sweep"
+              },
+              "samples": 242
+            },
+            "right": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 8,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 8,
+              "predicted_class": "Volumetric SYN Flood DDoS"
+            },
+            "samples": 250
+          },
+          "right": {
+            "is_leaf": false,
+            "feature": "ackFlagCount",
+            "threshold": 706,
+            "gain": 0.03148,
+            "left": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 231,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 231,
+              "predicted_class": "SSH Brute-Force Reconnaissance"
+            },
+            "right": {
+              "is_leaf": false,
+              "feature": "ackFlagCount",
+              "threshold": 884,
+              "gain": 0.40385,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 14,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 14,
+                "predicted_class": "SSH Brute-Force Reconnaissance"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 9,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 3,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 12,
+                "predicted_class": "Volumetric SYN Flood DDoS"
+              },
+              "samples": 26
+            },
+            "samples": 257
+          },
+          "samples": 507
+        },
+        "right": {
+          "is_leaf": true,
+          "value": {
+            "Benign Traffic Baseline": 0,
+            "Volumetric SYN Flood DDoS": 229,
+            "SSH Brute-Force Reconnaissance": 0,
+            "DNS Tunneling Data Exfiltration": 0,
+            "Stealth TCP SYN Port Sweep": 0
+          },
+          "samples": 229,
+          "predicted_class": "Volumetric SYN Flood DDoS"
+        },
+        "samples": 736
+      },
+      "samples": 1250
+    },
+    {
+      "is_leaf": false,
+      "feature": "synRatio",
+      "threshold": 0.19245,
+      "gain": 0.19741,
+      "left": {
+        "is_leaf": false,
+        "feature": "flowBytesPerSec",
+        "threshold": 771755.06162,
+        "gain": 0.45947,
+        "left": {
+          "is_leaf": false,
+          "feature": "ackFlagCount",
+          "threshold": 1635,
+          "gain": 0.03104,
+          "left": {
+            "is_leaf": false,
+            "feature": "flowDurationMs",
+            "threshold": 14803.1451,
+            "gain": 0.02437,
+            "left": {
+              "is_leaf": false,
+              "feature": "payloadEntropy",
+              "threshold": 5.47569,
+              "gain": 0.00837,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 1,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 1,
+                "predicted_class": "Benign Traffic Baseline"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 1,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 234,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 235,
+                "predicted_class": "DNS Tunneling Data Exfiltration"
+              },
+              "samples": 236
+            },
+            "right": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 3,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 3,
+              "predicted_class": "Benign Traffic Baseline"
+            },
+            "samples": 239
+          },
+          "right": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 4,
+              "Volumetric SYN Flood DDoS": 0,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 0,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 4,
+            "predicted_class": "Benign Traffic Baseline"
+          },
+          "samples": 243
+        },
+        "right": {
+          "is_leaf": false,
+          "feature": "payloadEntropy",
+          "threshold": 6.1609,
+          "gain": 0.0019,
+          "left": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 255,
+              "Volumetric SYN Flood DDoS": 0,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 0,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 255,
+            "predicted_class": "Benign Traffic Baseline"
+          },
+          "right": {
+            "is_leaf": false,
+            "feature": "payloadEntropy",
+            "threshold": 6.19563,
+            "gain": 0.375,
+            "left": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 3,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 3,
+              "predicted_class": "Benign Traffic Baseline"
+            },
+            "right": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 1,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 1,
+              "predicted_class": "DNS Tunneling Data Exfiltration"
+            },
+            "samples": 4
+          },
+          "samples": 259
+        },
+        "samples": 502
+      },
+      "right": {
+        "is_leaf": false,
+        "feature": "ackFlagCount",
+        "threshold": 1000,
+        "gain": 0.32783,
+        "left": {
+          "is_leaf": false,
+          "feature": "synRatio",
+          "threshold": 0.61639,
+          "gain": 0.43826,
+          "left": {
+            "is_leaf": false,
+            "feature": "asymmetricRatio",
+            "threshold": 15.76033,
+            "gain": 0.03587,
+            "left": {
+              "is_leaf": false,
+              "feature": "flowBytesPerSec",
+              "threshold": 79351.42901,
+              "gain": 0.03659,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 212,
+                  "DNS Tunneling Data Exfiltration": 1,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 213,
+                "predicted_class": "SSH Brute-Force Reconnaissance"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 1,
+                  "DNS Tunneling Data Exfiltration": 5,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 6,
+                "predicted_class": "DNS Tunneling Data Exfiltration"
+              },
+              "samples": 219
+            },
+            "right": {
+              "is_leaf": false,
+              "feature": "ackFlagCount",
+              "threshold": 174,
+              "gain": 0.48699,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 13
+                },
+                "samples": 13,
+                "predicted_class": "Stealth TCP SYN Port Sweep"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 18,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 18,
+                "predicted_class": "SSH Brute-Force Reconnaissance"
+              },
+              "samples": 31
+            },
+            "samples": 250
+          },
+          "right": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 0,
+              "Volumetric SYN Flood DDoS": 0,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 0,
+              "Stealth TCP SYN Port Sweep": 251
+            },
+            "samples": 251,
+            "predicted_class": "Stealth TCP SYN Port Sweep"
+          },
+          "samples": 501
+        },
+        "right": {
+          "is_leaf": false,
+          "feature": "ackFlagCount",
+          "threshold": 1075,
+          "gain": 0.00806,
+          "left": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 0,
+              "Volumetric SYN Flood DDoS": 0,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 1,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 1,
+            "predicted_class": "DNS Tunneling Data Exfiltration"
+          },
+          "right": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 0,
+              "Volumetric SYN Flood DDoS": 246,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 0,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 246,
+            "predicted_class": "Volumetric SYN Flood DDoS"
+          },
+          "samples": 247
+        },
+        "samples": 748
+      },
+      "samples": 1250
+    },
+    {
+      "is_leaf": false,
+      "feature": "averagePacketSizeBytes",
+      "threshold": 133.13805,
+      "gain": 0.19949,
+      "left": {
+        "is_leaf": false,
+        "feature": "synFlagCount",
+        "threshold": 128688,
+        "gain": 0.48654,
+        "left": {
+          "is_leaf": false,
+          "feature": "flowBytesPerSec",
+          "threshold": 295224.52378,
+          "gain": 0.01503,
+          "left": {
+            "is_leaf": false,
+            "feature": "flowPacketsPerSec",
+            "threshold": 31.75767,
+            "gain": 0.00757,
+            "left": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 1,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 1,
+              "predicted_class": "SSH Brute-Force Reconnaissance"
+            },
+            "right": {
+              "is_leaf": false,
+              "feature": "asymmetricRatio",
+              "threshold": 3.975,
+              "gain": 0.01538,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 2,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 2,
+                "predicted_class": "SSH Brute-Force Reconnaissance"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 256
+                },
+                "samples": 256,
+                "predicted_class": "Stealth TCP SYN Port Sweep"
+              },
+              "samples": 258
+            },
+            "samples": 259
+          },
+          "right": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 0,
+              "Volumetric SYN Flood DDoS": 2,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 0,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 2,
+            "predicted_class": "Volumetric SYN Flood DDoS"
+          },
+          "samples": 261
+        },
+        "right": {
+          "is_leaf": true,
+          "value": {
+            "Benign Traffic Baseline": 0,
+            "Volumetric SYN Flood DDoS": 251,
+            "SSH Brute-Force Reconnaissance": 0,
+            "DNS Tunneling Data Exfiltration": 0,
+            "Stealth TCP SYN Port Sweep": 0
+          },
+          "samples": 251,
+          "predicted_class": "Volumetric SYN Flood DDoS"
+        },
+        "samples": 512
+      },
+      "right": {
+        "is_leaf": false,
+        "feature": "flowBytesPerSec",
+        "threshold": 1032734.45205,
+        "gain": 0.29881,
+        "left": {
+          "is_leaf": false,
+          "feature": "payloadEntropy",
+          "threshold": 7.32041,
+          "gain": 0.45489,
+          "left": {
+            "is_leaf": false,
+            "feature": "ackFlagCount",
+            "threshold": 1151,
+            "gain": 0.07873,
+            "left": {
+              "is_leaf": false,
+              "feature": "synRatio",
+              "threshold": 0.31517,
+              "gain": 0.02091,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 5,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 13,
+                  "DNS Tunneling Data Exfiltration": 4,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 22,
+                "predicted_class": "SSH Brute-Force Reconnaissance"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 219,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 219,
+                "predicted_class": "SSH Brute-Force Reconnaissance"
+              },
+              "samples": 241
+            },
+            "right": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 11,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 11,
+              "predicted_class": "Benign Traffic Baseline"
+            },
+            "samples": 252
+          },
+          "right": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 0,
+              "Volumetric SYN Flood DDoS": 0,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 261,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 261,
+            "predicted_class": "DNS Tunneling Data Exfiltration"
+          },
+          "samples": 513
+        },
+        "right": {
+          "is_leaf": true,
+          "value": {
+            "Benign Traffic Baseline": 225,
+            "Volumetric SYN Flood DDoS": 0,
+            "SSH Brute-Force Reconnaissance": 0,
+            "DNS Tunneling Data Exfiltration": 0,
+            "Stealth TCP SYN Port Sweep": 0
+          },
+          "samples": 225,
+          "predicted_class": "Benign Traffic Baseline"
+        },
+        "samples": 738
+      },
+      "samples": 1250
+    },
+    {
+      "is_leaf": false,
+      "feature": "synRatio",
+      "threshold": 0.19048,
+      "gain": 0.19353,
+      "left": {
+        "is_leaf": false,
+        "feature": "payloadEntropy",
+        "threshold": 6.17882,
+        "gain": 0.49549,
+        "left": {
+          "is_leaf": true,
+          "value": {
+            "Benign Traffic Baseline": 260,
+            "Volumetric SYN Flood DDoS": 0,
+            "SSH Brute-Force Reconnaissance": 0,
+            "DNS Tunneling Data Exfiltration": 0,
+            "Stealth TCP SYN Port Sweep": 0
+          },
+          "samples": 260,
+          "predicted_class": "Benign Traffic Baseline"
+        },
+        "right": {
+          "is_leaf": false,
+          "feature": "totalBwdPackets",
+          "threshold": 999,
+          "gain": 0.00813,
+          "left": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 0,
+              "Volumetric SYN Flood DDoS": 0,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 244,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 244,
+            "predicted_class": "DNS Tunneling Data Exfiltration"
+          },
+          "right": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 1,
+              "Volumetric SYN Flood DDoS": 0,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 0,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 1,
+            "predicted_class": "Benign Traffic Baseline"
+          },
+          "samples": 245
+        },
+        "samples": 505
+      },
+      "right": {
+        "is_leaf": false,
+        "feature": "flowPacketsPerSec",
+        "threshold": 25230.45643,
+        "gain": 0.29599,
+        "left": {
+          "is_leaf": false,
+          "feature": "averagePacketSizeBytes",
+          "threshold": 118.25333,
+          "gain": 0.45068,
+          "left": {
+            "is_leaf": false,
+            "feature": "totalFwdPackets",
+            "threshold": 2834,
+            "gain": 0.04344,
+            "left": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 231
+              },
+              "samples": 231,
+              "predicted_class": "Stealth TCP SYN Port Sweep"
+            },
+            "right": {
+              "is_leaf": false,
+              "feature": "totalBwdPackets",
+              "threshold": 99,
+              "gain": 0.49931,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 14
+                },
+                "samples": 14,
+                "predicted_class": "Stealth TCP SYN Port Sweep"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 13,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 13,
+                "predicted_class": "Volumetric SYN Flood DDoS"
+              },
+              "samples": 27
+            },
+            "samples": 258
+          },
+          "right": {
+            "is_leaf": false,
+            "feature": "averagePacketSizeBytes",
+            "threshold": 491.88621,
+            "gain": 0.04608,
+            "left": {
+              "is_leaf": false,
+              "feature": "synRatio",
+              "threshold": 0.19423,
+              "gain": 0.00844,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 1,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 1,
+                "predicted_class": "DNS Tunneling Data Exfiltration"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 235,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 235,
+                "predicted_class": "SSH Brute-Force Reconnaissance"
+              },
+              "samples": 236
+            },
+            "right": {
+              "is_leaf": false,
+              "feature": "synRatio",
+              "threshold": 0.19853,
+              "gain": 0.4992,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 13,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 13,
+                "predicted_class": "DNS Tunneling Data Exfiltration"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 12,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 12,
+                "predicted_class": "SSH Brute-Force Reconnaissance"
+              },
+              "samples": 25
+            },
+            "samples": 261
+          },
+          "samples": 519
+        },
+        "right": {
+          "is_leaf": true,
+          "value": {
+            "Benign Traffic Baseline": 0,
+            "Volumetric SYN Flood DDoS": 226,
+            "SSH Brute-Force Reconnaissance": 0,
+            "DNS Tunneling Data Exfiltration": 0,
+            "Stealth TCP SYN Port Sweep": 0
+          },
+          "samples": 226,
+          "predicted_class": "Volumetric SYN Flood DDoS"
+        },
+        "samples": 745
+      },
+      "samples": 1250
+    },
+    {
+      "is_leaf": false,
+      "feature": "payloadEntropy",
+      "threshold": 6.43429,
+      "gain": 0.19722,
+      "left": {
+        "is_leaf": false,
+        "feature": "averagePacketSizeBytes",
+        "threshold": 156.7275,
+        "gain": 0.23576,
+        "left": {
+          "is_leaf": false,
+          "feature": "totalFwdPackets",
+          "threshold": 2936,
+          "gain": 0.44533,
+          "left": {
+            "is_leaf": false,
+            "feature": "ackFlagCount",
+            "threshold": 268,
+            "gain": 0.066,
+            "left": {
+              "is_leaf": false,
+              "feature": "flowDurationMs",
+              "threshold": 7969.52126,
+              "gain": 0.04144,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 234
+                },
+                "samples": 234,
+                "predicted_class": "Stealth TCP SYN Port Sweep"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 6,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 1
+                },
+                "samples": 7,
+                "predicted_class": "SSH Brute-Force Reconnaissance"
+              },
+              "samples": 241
+            },
+            "right": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 9,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 9,
+              "predicted_class": "SSH Brute-Force Reconnaissance"
+            },
+            "samples": 250
+          },
+          "right": {
+            "is_leaf": false,
+            "feature": "flowBytesPerSec",
+            "threshold": 45746.98003,
+            "gain": 0.03038,
+            "left": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 4
+              },
+              "samples": 4,
+              "predicted_class": "Stealth TCP SYN Port Sweep"
+            },
+            "right": {
+              "is_leaf": false,
+              "feature": "flowDurationMs",
+              "threshold": 1392.61991,
+              "gain": 0.00787,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 1
+                },
+                "samples": 1,
+                "predicted_class": "Stealth TCP SYN Port Sweep"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 246,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 2
+                },
+                "samples": 248,
+                "predicted_class": "Volumetric SYN Flood DDoS"
+              },
+              "samples": 249
+            },
+            "samples": 253
+          },
+          "samples": 503
+        },
+        "right": {
+          "is_leaf": false,
+          "feature": "flowBytesPerSec",
+          "threshold": 724787.36017,
+          "gain": 0.45372,
+          "left": {
+            "is_leaf": false,
+            "feature": "flowBytesPerSec",
+            "threshold": 301320.23754,
+            "gain": 0.06669,
+            "left": {
+              "is_leaf": false,
+              "feature": "asymmetricRatio",
+              "threshold": 0.44854,
+              "gain": 0.01606,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 2,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 2,
+                "predicted_class": "Benign Traffic Baseline"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 1,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 242,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 243,
+                "predicted_class": "SSH Brute-Force Reconnaissance"
+              },
+              "samples": 245
+            },
+            "right": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 9,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 9,
+              "predicted_class": "Benign Traffic Baseline"
+            },
+            "samples": 254
+          },
+          "right": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 245,
+              "Volumetric SYN Flood DDoS": 0,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 0,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 245,
+            "predicted_class": "Benign Traffic Baseline"
+          },
+          "samples": 499
+        },
+        "samples": 1002
+      },
+      "right": {
+        "is_leaf": false,
+        "feature": "payloadEntropy",
+        "threshold": 6.49236,
+        "gain": 0.00803,
+        "left": {
+          "is_leaf": true,
+          "value": {
+            "Benign Traffic Baseline": 0,
+            "Volumetric SYN Flood DDoS": 0,
+            "SSH Brute-Force Reconnaissance": 1,
+            "DNS Tunneling Data Exfiltration": 0,
+            "Stealth TCP SYN Port Sweep": 0
+          },
+          "samples": 1,
+          "predicted_class": "SSH Brute-Force Reconnaissance"
+        },
+        "right": {
+          "is_leaf": true,
+          "value": {
+            "Benign Traffic Baseline": 0,
+            "Volumetric SYN Flood DDoS": 0,
+            "SSH Brute-Force Reconnaissance": 0,
+            "DNS Tunneling Data Exfiltration": 247,
+            "Stealth TCP SYN Port Sweep": 0
+          },
+          "samples": 247,
+          "predicted_class": "DNS Tunneling Data Exfiltration"
+        },
+        "samples": 248
+      },
+      "samples": 1250
+    },
+    {
+      "is_leaf": false,
+      "feature": "synRatio",
+      "threshold": 0.1979,
+      "gain": 0.19809,
+      "left": {
+        "is_leaf": false,
+        "feature": "synRatio",
+        "threshold": 0.10547,
+        "gain": 0.25646,
+        "left": {
+          "is_leaf": false,
+          "feature": "totalBwdPackets",
+          "threshold": 1032,
+          "gain": 0.09289,
+          "left": {
+            "is_leaf": false,
+            "feature": "payloadEntropy",
+            "threshold": 7.34843,
+            "gain": 0.40541,
+            "left": {
+              "is_leaf": false,
+              "feature": "synRatio",
+              "threshold": 0.04775,
+              "gain": 0.00876,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 47,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 47,
+                "predicted_class": "Benign Traffic Baseline"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 52,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 8,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 60,
+                "predicted_class": "Benign Traffic Baseline"
+              },
+              "samples": 107
+            },
+            "right": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 67,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 67,
+              "predicted_class": "DNS Tunneling Data Exfiltration"
+            },
+            "samples": 174
+          },
+          "right": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 176,
+              "Volumetric SYN Flood DDoS": 0,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 0,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 176,
+            "predicted_class": "Benign Traffic Baseline"
+          },
+          "samples": 350
+        },
+        "right": {
+          "is_leaf": true,
+          "value": {
+            "Benign Traffic Baseline": 0,
+            "Volumetric SYN Flood DDoS": 0,
+            "SSH Brute-Force Reconnaissance": 0,
+            "DNS Tunneling Data Exfiltration": 146,
+            "Stealth TCP SYN Port Sweep": 0
+          },
+          "samples": 146,
+          "predicted_class": "DNS Tunneling Data Exfiltration"
+        },
+        "samples": 496
+      },
+      "right": {
+        "is_leaf": false,
+        "feature": "flowBytesPerSec",
+        "threshold": 2356384.9376,
+        "gain": 0.28623,
+        "left": {
+          "is_leaf": false,
+          "feature": "flowPacketsPerSec",
+          "threshold": 178.60054,
+          "gain": 0.28873,
+          "left": {
+            "is_leaf": false,
+            "feature": "averagePacketSizeBytes",
+            "threshold": 69.47305,
+            "gain": 0.14683,
+            "left": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 22
+              },
+              "samples": 22,
+              "predicted_class": "Stealth TCP SYN Port Sweep"
+            },
+            "right": {
+              "is_leaf": false,
+              "feature": "totalBwdPackets",
+              "threshold": 512,
+              "gain": 0.02389,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 238,
+                  "DNS Tunneling Data Exfiltration": 1,
+                  "Stealth TCP SYN Port Sweep": 2
+                },
+                "samples": 241,
+                "predicted_class": "SSH Brute-Force Reconnaissance"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 3,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 3,
+                "predicted_class": "DNS Tunneling Data Exfiltration"
+              },
+              "samples": 244
+            },
+            "samples": 266
+          },
+          "right": {
+            "is_leaf": false,
+            "feature": "averagePacketSizeBytes",
+            "threshold": 209.43071,
+            "gain": 0.14618,
+            "left": {
+              "is_leaf": false,
+              "feature": "totalBwdPackets",
+              "threshold": 111,
+              "gain": 0.1583,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 2,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 215
+                },
+                "samples": 217,
+                "predicted_class": "Stealth TCP SYN Port Sweep"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 21,
+                  "SSH Brute-Force Reconnaissance": 1,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 22,
+                "predicted_class": "Volumetric SYN Flood DDoS"
+              },
+              "samples": 239
+            },
+            "right": {
+              "is_leaf": false,
+              "feature": "synRatio",
+              "threshold": 0.19843,
+              "gain": 0.14201,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 2,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 2,
+                "predicted_class": "DNS Tunneling Data Exfiltration"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 24,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 24,
+                "predicted_class": "SSH Brute-Force Reconnaissance"
+              },
+              "samples": 26
+            },
+            "samples": 265
+          },
+          "samples": 531
+        },
+        "right": {
+          "is_leaf": true,
+          "value": {
+            "Benign Traffic Baseline": 0,
+            "Volumetric SYN Flood DDoS": 223,
+            "SSH Brute-Force Reconnaissance": 0,
+            "DNS Tunneling Data Exfiltration": 0,
+            "Stealth TCP SYN Port Sweep": 0
+          },
+          "samples": 223,
+          "predicted_class": "Volumetric SYN Flood DDoS"
+        },
+        "samples": 754
+      },
+      "samples": 1250
+    },
+    {
+      "is_leaf": false,
+      "feature": "synRatio",
+      "threshold": 0.18981,
+      "gain": 0.19571,
+      "left": {
+        "is_leaf": false,
+        "feature": "payloadEntropy",
+        "threshold": 6.16899,
+        "gain": 0.48745,
+        "left": {
+          "is_leaf": true,
+          "value": {
+            "Benign Traffic Baseline": 257,
+            "Volumetric SYN Flood DDoS": 0,
+            "SSH Brute-Force Reconnaissance": 0,
+            "DNS Tunneling Data Exfiltration": 0,
+            "Stealth TCP SYN Port Sweep": 0
+          },
+          "samples": 257,
+          "predicted_class": "Benign Traffic Baseline"
+        },
+        "right": {
+          "is_leaf": false,
+          "feature": "flowPacketsPerSec",
+          "threshold": 534.42831,
+          "gain": 0.01612,
+          "left": {
+            "is_leaf": false,
+            "feature": "payloadEntropy",
+            "threshold": 6.19483,
+            "gain": 0.00823,
+            "left": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 1,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 1,
+              "predicted_class": "Benign Traffic Baseline"
+            },
+            "right": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 241,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 241,
+              "predicted_class": "DNS Tunneling Data Exfiltration"
+            },
+            "samples": 242
+          },
+          "right": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 2,
+              "Volumetric SYN Flood DDoS": 0,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 0,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 2,
+            "predicted_class": "Benign Traffic Baseline"
+          },
+          "samples": 244
+        },
+        "samples": 501
+      },
+      "right": {
+        "is_leaf": false,
+        "feature": "ackFlagCount",
+        "threshold": 765,
+        "gain": 0.30432,
+        "left": {
+          "is_leaf": false,
+          "feature": "flowDurationMs",
+          "threshold": 9469.69076,
+          "gain": 0.36097,
+          "left": {
+            "is_leaf": false,
+            "feature": "totalBwdPackets",
+            "threshold": 99,
+            "gain": 0.18797,
+            "left": {
+              "is_leaf": false,
+              "feature": "payloadEntropy",
+              "threshold": 5.42838,
+              "gain": 0.00626,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 239
+                },
+                "samples": 239,
+                "predicted_class": "Stealth TCP SYN Port Sweep"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 3,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 8
+                },
+                "samples": 11,
+                "predicted_class": "Stealth TCP SYN Port Sweep"
+              },
+              "samples": 250
+            },
+            "right": {
+              "is_leaf": false,
+              "feature": "totalBwdPackets",
+              "threshold": 100,
+              "gain": 0.13166,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 3
+                },
+                "samples": 3,
+                "predicted_class": "Stealth TCP SYN Port Sweep"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 35,
+                  "DNS Tunneling Data Exfiltration": 2,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 37,
+                "predicted_class": "SSH Brute-Force Reconnaissance"
+              },
+              "samples": 40
+            },
+            "samples": 290
+          },
+          "right": {
+            "is_leaf": false,
+            "feature": "synRatio",
+            "threshold": 0.19181,
+            "gain": 0.00939,
+            "left": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 1,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 1,
+              "predicted_class": "DNS Tunneling Data Exfiltration"
+            },
+            "right": {
+              "is_leaf": false,
+              "feature": "synRatio",
+              "threshold": 0.19394,
+              "gain": 0.00952,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 1,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 1,
+                "predicted_class": "DNS Tunneling Data Exfiltration"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 208,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 208,
+                "predicted_class": "SSH Brute-Force Reconnaissance"
+              },
+              "samples": 209
+            },
+            "samples": 210
+          },
+          "samples": 500
+        },
+        "right": {
+          "is_leaf": false,
+          "feature": "asymmetricRatio",
+          "threshold": 18.10359,
+          "gain": 0.0315,
+          "left": {
+            "is_leaf": false,
+            "feature": "flowPacketsPerSec",
+            "threshold": 353.96587,
+            "gain": 0.37787,
+            "left": {
+              "is_leaf": false,
+              "feature": "synFlagCount",
+              "threshold": 297,
+              "gain": 0.48611,
+              "left": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 0,
+                  "DNS Tunneling Data Exfiltration": 5,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 5,
+                "predicted_class": "DNS Tunneling Data Exfiltration"
+              },
+              "right": {
+                "is_leaf": true,
+                "value": {
+                  "Benign Traffic Baseline": 0,
+                  "Volumetric SYN Flood DDoS": 0,
+                  "SSH Brute-Force Reconnaissance": 7,
+                  "DNS Tunneling Data Exfiltration": 0,
+                  "Stealth TCP SYN Port Sweep": 0
+                },
+                "samples": 7,
+                "predicted_class": "SSH Brute-Force Reconnaissance"
+              },
+              "samples": 12
+            },
+            "right": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 13,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 13,
+              "predicted_class": "Volumetric SYN Flood DDoS"
+            },
+            "samples": 25
+          },
+          "right": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 0,
+              "Volumetric SYN Flood DDoS": 224,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 0,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 224,
+            "predicted_class": "Volumetric SYN Flood DDoS"
+          },
+          "samples": 249
+        },
+        "samples": 749
+      },
+      "samples": 1250
+    },
+    {
+      "is_leaf": false,
+      "feature": "synRatio",
+      "threshold": 0.19842,
+      "gain": 0.19997,
+      "left": {
+        "is_leaf": false,
+        "feature": "payloadEntropy",
+        "threshold": 6.19563,
+        "gain": 0.49919,
+        "left": {
+          "is_leaf": true,
+          "value": {
+            "Benign Traffic Baseline": 239,
+            "Volumetric SYN Flood DDoS": 0,
+            "SSH Brute-Force Reconnaissance": 0,
+            "DNS Tunneling Data Exfiltration": 0,
+            "Stealth TCP SYN Port Sweep": 0
+          },
+          "samples": 239,
+          "predicted_class": "Benign Traffic Baseline"
+        },
+        "right": {
+          "is_leaf": true,
+          "value": {
+            "Benign Traffic Baseline": 0,
+            "Volumetric SYN Flood DDoS": 0,
+            "SSH Brute-Force Reconnaissance": 0,
+            "DNS Tunneling Data Exfiltration": 259,
+            "Stealth TCP SYN Port Sweep": 0
+          },
+          "samples": 259,
+          "predicted_class": "DNS Tunneling Data Exfiltration"
+        },
+        "samples": 498
+      },
+      "right": {
+        "is_leaf": false,
+        "feature": "ackFlagCount",
+        "threshold": 772,
+        "gain": 0.32163,
+        "left": {
+          "is_leaf": false,
+          "feature": "synRatio",
+          "threshold": 0.54622,
+          "gain": 0.49575,
+          "left": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 0,
+              "Volumetric SYN Flood DDoS": 0,
+              "SSH Brute-Force Reconnaissance": 237,
+              "DNS Tunneling Data Exfiltration": 0,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 237,
+            "predicted_class": "SSH Brute-Force Reconnaissance"
+          },
+          "right": {
+            "is_leaf": false,
+            "feature": "synRatio",
+            "threshold": 0.5496,
+            "gain": 0.00806,
+            "left": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 1,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 1,
+              "predicted_class": "SSH Brute-Force Reconnaissance"
+            },
+            "right": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 246
+              },
+              "samples": 246,
+              "predicted_class": "Stealth TCP SYN Port Sweep"
+            },
+            "samples": 247
+          },
+          "samples": 484
+        },
+        "right": {
+          "is_leaf": false,
+          "feature": "flowPacketsPerSec",
+          "threshold": 27120.11521,
+          "gain": 0.02293,
+          "left": {
+            "is_leaf": false,
+            "feature": "totalBwdPackets",
+            "threshold": 391,
+            "gain": 0.46875,
+            "left": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 0,
+                "SSH Brute-Force Reconnaissance": 9,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 9,
+              "predicted_class": "SSH Brute-Force Reconnaissance"
+            },
+            "right": {
+              "is_leaf": true,
+              "value": {
+                "Benign Traffic Baseline": 0,
+                "Volumetric SYN Flood DDoS": 15,
+                "SSH Brute-Force Reconnaissance": 0,
+                "DNS Tunneling Data Exfiltration": 0,
+                "Stealth TCP SYN Port Sweep": 0
+              },
+              "samples": 15,
+              "predicted_class": "Volumetric SYN Flood DDoS"
+            },
+            "samples": 24
+          },
+          "right": {
+            "is_leaf": true,
+            "value": {
+              "Benign Traffic Baseline": 0,
+              "Volumetric SYN Flood DDoS": 244,
+              "SSH Brute-Force Reconnaissance": 0,
+              "DNS Tunneling Data Exfiltration": 0,
+              "Stealth TCP SYN Port Sweep": 0
+            },
+            "samples": 244,
+            "predicted_class": "Volumetric SYN Flood DDoS"
+          },
+          "samples": 268
+        },
+        "samples": 752
+      },
+      "samples": 1250
+    }
+  ]
+}
