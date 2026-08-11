@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 function getJwtSecret(): string {
-  return process.env.JWT_SECRET || 'intrushield-secret-key-soc-2026';
+  return process.env.JWT_SECRET || process.env.intrushield || 'intrushield-secret-key-soc-2026';
 }
 
 const JWT_SECRET = getJwtSecret();
