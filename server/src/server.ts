@@ -13,6 +13,7 @@ import threatIntelRouter from './routes/threatIntel';
 import pcapRouter from './routes/pcap';
 import mitigationRouter from './routes/mitigation';
 import usersRouter from './routes/users';
+import modelsRouter from './routes/models';
 
 import { auditLogger } from './middleware/auditLogger';
 import { setupLiveStreamWebSocket } from './websocket/liveStream';
@@ -61,6 +62,7 @@ app.use('/api/threat-intel', threatIntelRouter);
 app.use('/api/pcap', pcapRouter);
 app.use('/api/mitigation', mitigationRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/models', modelsRouter);
 
 // Health check endpoints (Placed before SPA catch-all fallback)
 const handleHealthCheck = (_req: Request, res: Response) => {

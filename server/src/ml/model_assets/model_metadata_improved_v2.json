@@ -1,0 +1,275 @@
+{
+  "modelName": "IntruShield Random Forest NIDS Classifier (Improved V2)",
+  "algorithm": "RandomForestClassifier",
+  "dataset": "CIC-IDS2017 Enterprise Traffic Benchmark (V2 Expanded Features)",
+  "version": "2.2.0",
+  "trainedAt": "2026-08-15T18:35:20Z",
+  "randomSeed": 42,
+  "trainingSamples": 60800,
+  "testSamples": 15200,
+  "featureCount": 25,
+  "features": [
+    "Flow Duration",
+    "Total Fwd Packets",
+    "Total Backward Packets",
+    "Total Length of Fwd Packets",
+    "Total Length of Bwd Packets",
+    "Fwd Packet Length Max",
+    "Fwd Packet Length Mean",
+    "Fwd Packet Length Std",
+    "Bwd Packet Length Max",
+    "Bwd Packet Length Mean",
+    "Bwd Packet Length Std",
+    "Flow Bytes/s",
+    "Flow Packets/s",
+    "Flow IAT Mean",
+    "Flow IAT Std",
+    "Flow IAT Max",
+    "Flow IAT Min",
+    "Fwd IAT Mean",
+    "Bwd IAT Mean",
+    "SYN Flag Count",
+    "ACK Flag Count",
+    "PSH Flag Count",
+    "Average Packet Size",
+    "Down/Up Ratio",
+    "Destination Port Category"
+  ],
+  "attackClasses": [
+    "BENIGN",
+    "Botnet C2",
+    "DDoS Volumetric",
+    "DoS / SYN Flood",
+    "FTP Brute Force",
+    "Port Scan",
+    "SSH Brute Force",
+    "Web Attack (SQLi)",
+    "Web Attack (XSS)",
+    "Web Brute Force"
+  ],
+  "unsupportedClasses": [
+    "Heartbleed",
+    "Infiltration"
+  ],
+  "hyperparameters": {
+    "max_depth": 20,
+    "max_features": "sqrt",
+    "min_samples_leaf": 1,
+    "n_estimators": 200
+  },
+  "metrics": {
+    "accuracy": 0.9985526315789474,
+    "macroPrecision": 0.9918549635517641,
+    "macroRecall": 0.9960095238095239,
+    "macroF1Score": 0.9938925867049411,
+    "weightedPrecision": 0.9985696384846114,
+    "weightedRecall": 0.9985526315789474,
+    "weightedF1Score": 0.9985551012207463,
+    "rocAuc": 0.9999456873874613
+  },
+  "perClassMetrics": {
+    "BENIGN": {
+      "precision": 0.9997139178944358,
+      "recall": 0.9984285714285714,
+      "f1Score": 0.9990708312486598,
+      "support": 7000
+    },
+    "Botnet C2": {
+      "precision": 0.9876543209876543,
+      "recall": 1.0,
+      "f1Score": 0.9937888198757764,
+      "support": 400
+    },
+    "DDoS Volumetric": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1Score": 1.0,
+      "support": 2000
+    },
+    "DoS / SYN Flood": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1Score": 1.0,
+      "support": 2400
+    },
+    "FTP Brute Force": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1Score": 1.0,
+      "support": 600
+    },
+    "Port Scan": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1Score": 1.0,
+      "support": 1600
+    },
+    "SSH Brute Force": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1Score": 1.0,
+      "support": 600
+    },
+    "Web Attack (SQLi)": {
+      "precision": 0.9900990099009901,
+      "recall": 1.0,
+      "f1Score": 0.9950248756218906,
+      "support": 100
+    },
+    "Web Attack (XSS)": {
+      "precision": 0.961352657004831,
+      "recall": 0.995,
+      "f1Score": 0.9778869778869779,
+      "support": 200
+    },
+    "Web Brute Force": {
+      "precision": 0.9797297297297297,
+      "recall": 0.9666666666666667,
+      "f1Score": 0.9731543624161074,
+      "support": 300
+    }
+  },
+  "confusionMatrix": {
+    "labels": [
+      "BENIGN",
+      "Botnet C2",
+      "DDoS Volumetric",
+      "DoS / SYN Flood",
+      "FTP Brute Force",
+      "Port Scan",
+      "SSH Brute Force",
+      "Web Attack (SQLi)",
+      "Web Attack (XSS)",
+      "Web Brute Force"
+    ],
+    "matrix": [
+      [
+        6989,
+        5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        6
+      ],
+      [
+        0,
+        400,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        2000,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        2400,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        600,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1600,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        600,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        100,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        199,
+        0
+      ],
+      [
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        8,
+        290
+      ]
+    ]
+  },
+  "runtimeMetrics": {
+    "trainingTimeSeconds": 28.550484657287598,
+    "modelSizeBytesMB": 8.471413612365723,
+    "numberOfTrees": 200,
+    "maxDepth": 20,
+    "avgInferenceLatencyMs": 0.013512294543416877
+  }
+}

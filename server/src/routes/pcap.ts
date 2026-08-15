@@ -2,10 +2,13 @@ import { Router, Response } from 'express';
 import multer from 'multer';
 import { getDb, saveDb } from '../db/database';
 import { requireAuth, AuthenticatedRequest } from '../middleware/authMiddleware';
-import { classifyNetworkFlow } from '../ml/inferenceEngine';
+import { classifyNetworkFlow, MLInferenceResult } from '../ml/inferenceEngine';
+import { extractFlowsFromPcap, NetworkFlowFeatures } from '../ml/pcapParser';
 
 const router = Router();
-const upload = multer({ limits: { fileSize: 50 * 1024 * 1024 } }); // 50MB max
+const upload = multer({
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max file limit
+});
 
 function queryObjects(sql: string, params: any[] = []): Record<string, any>[] {
   const db = getDb();
@@ -20,9 +23,98 @@ function queryObjects(sql: string, params: any[] = []): Record<string, any>[] {
 }
 
 /**
+ * Required CSV headers for CIC-IDS feature verification
+ */
+const REQUIRED_CSV_FEATURES = [
+  'flowdurationms',
+  'totalfwdpackets',
+  'totalbwdpackets',
+  'flowbytespersec',
+  'flowpacketspersec',
+  'synflagcount',
+];
+
+/**
+ * Validates CSV header strings against required feature columns
+ */
+function validateCsvHeaders(headerRow: string): { isValid: boolean; missingColumns: string[] } {
+  const normalizedHeaders = headerRow.toLowerCase().split(',').map(h => h.trim().replace(/["']/g, '').replace(/[\s_/]/g, ''));
+  const missing: string[] = [];
+
+  for (const feature of REQUIRED_CSV_FEATURES) {
+    if (!normalizedHeaders.some(h => h.includes(feature) || feature.includes(h))) {
+      missing.push(feature);
+    }
+  }
+
+  return {
+    isValid: missing.length === 0,
+    missingColumns: missing,
+  };
+}
+
+/**
+ * Parses raw CSV content buffer into flow feature objects
+ */
+function parseCsvBuffer(buffer: Buffer): Partial<NetworkFlowFeatures>[] {
+  const content = buffer.toString('utf-8');
+  const lines = content.split(/\r?\n/).filter(line => line.trim().length > 0);
+  if (lines.length <= 1) {
+    throw new Error('CSV file is empty or contains no data rows.');
+  }
+
+  const headerValidation = validateCsvHeaders(lines[0]);
+  if (!headerValidation.isValid) {
+    throw new Error(`CSV file missing required feature columns: ${headerValidation.missingColumns.join(', ')}`);
+  }
+
+  const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/["']/g, '').replace(/[\s_/]/g, ''));
+  const getColIdx = (name: string) => headers.findIndex(h => h.includes(name));
+
+  const durationIdx = getColIdx('flowdurationms');
+  const fwdPktIdx = getColIdx('totalfwdpackets');
+  const bwdPktIdx = getColIdx('totalbwdpackets');
+  const bytesPerSecIdx = getColIdx('flowbytespersec');
+  const pktsPerSecIdx = getColIdx('flowpacketspersec');
+  const synIdx = getColIdx('synflagcount');
+  const entropyIdx = getColIdx('payloadentropy');
+
+  const flows: Partial<NetworkFlowFeatures>[] = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(',').map(c => c.trim());
+    if (cols.length < headers.length) continue;
+
+    const flowDurationMs = parseFloat(cols[durationIdx]) || 1000;
+    const totalFwdPackets = parseInt(cols[fwdPktIdx], 10) || 1;
+    const totalBwdPackets = parseInt(cols[bwdPktIdx], 10) || 0;
+    const flowBytesPerSec = parseFloat(cols[bytesPerSecIdx]) || 0;
+    const flowPacketsPerSec = parseFloat(cols[pktsPerSecIdx]) || 0;
+    const synFlagCount = parseInt(cols[synIdx], 10) || 0;
+    const payloadEntropy = entropyIdx >= 0 ? parseFloat(cols[entropyIdx]) || 5.0 : 5.0;
+
+    const totalPackets = Math.max(1, totalFwdPackets + totalBwdPackets);
+
+    flows.push({
+      flowDurationMs,
+      totalFwdPackets,
+      totalBwdPackets,
+      flowBytesPerSec,
+      flowPacketsPerSec,
+      synFlagCount,
+      synFlagRatio: Number((synFlagCount / totalPackets).toFixed(3)),
+      payloadEntropy,
+      asymmetricRatio: Number((totalFwdPackets / Math.max(1, totalBwdPackets)).toFixed(2)),
+    });
+  }
+
+  return flows;
+}
+
+/**
  * @route GET /api/pcap/scans
- * @desc Fetch historical PCAP analysis scans
- * @access Private (Requires Auth Token)
+ * @desc Fetch historical PCAP / CSV analysis scans
+ * @access Private
  */
 router.get('/scans', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -40,7 +132,7 @@ router.get('/scans', requireAuth, (req: AuthenticatedRequest, res: Response) => 
       predictedConfidence: r.predicted_confidence,
       extractedFeatures: JSON.parse(r.extracted_features_json || '{}'),
       topFeatures: JSON.parse(r.top_features_json || '[]'),
-      createdAt: r.created_at
+      createdAt: r.created_at,
     }));
 
     res.json({ scans, count: scans.length });
@@ -49,47 +141,101 @@ router.get('/scans', requireAuth, (req: AuthenticatedRequest, res: Response) => 
   }
 });
 
-// Upload and Analyze PCAP File (Protected)
+/**
+ * @route POST /api/pcap/upload
+ * @desc Ingest and analyze real PCAP, PCAPNG, or CSV files
+ * @access Private
+ */
 router.post('/upload', requireAuth, upload.single('file'), (req: AuthenticatedRequest, res: Response) => {
   try {
     const file = req.file;
-    const fileName = file?.originalname || req.body?.fileName || 'capture_sample.pcap';
-    const fileSize = file?.size || Number(req.body?.fileSize) || 14285000;
+    if (!file || !file.buffer) {
+      res.status(400).json({ error: 'No file uploaded. Please attach a valid .pcap, .pcapng, or .csv file.' });
+      return;
+    }
 
-    const totalPackets = Math.floor(fileSize / 142) + Math.floor(Math.random() * 500);
-    const flowCount = Math.floor(totalPackets / 18);
-    const flowDurationMs = 4500;
-    const totalFwdPackets = Math.floor(totalPackets * 0.6);
-    const totalBwdPackets = Math.floor(totalPackets * 0.4);
-    const flowBytesPerSec = Math.floor(fileSize / 4.5);
-    const flowPacketsPerSec = Math.floor(totalPackets / 4.5);
-    const synFlagCount = Math.floor(totalPackets * 0.45);
+    const fileName = file.originalname || 'analysis_capture.pcap';
+    const fileSize = file.size;
+    const lowerName = fileName.toLowerCase();
 
-    // Invoke ML Decision Engine
-    const mlResult = classifyNetworkFlow(
-      {
-        flowDurationMs,
-        totalFwdPackets,
-        totalBwdPackets,
-        flowBytesPerSec,
-        flowPacketsPerSec,
-        synFlagCount,
-        ackFlagCount: Math.floor(totalPackets * 0.2),
-        payloadEntropy: fileName.toLowerCase().includes('dns') ? 7.85 : 5.12,
-        averagePacketSizeBytes: Math.floor(fileSize / totalPackets),
-      },
-      fileName
-    );
+    let totalPackets = 0;
+    let flowCount = 0;
+    let primaryMlResult: MLInferenceResult;
+    let extractedFeaturesSummary: Record<string, any> = {};
 
+    const startTime = Date.now();
+
+    if (lowerName.endsWith('.csv')) {
+      // Process CSV feature file
+      const csvFlows = parseCsvBuffer(file.buffer);
+      flowCount = csvFlows.length;
+      totalPackets = csvFlows.reduce((acc, f) => acc + (f.totalFwdPackets || 0) + (f.totalBwdPackets || 0), 0);
+
+      // Evaluate highest-risk flow
+      let highestRiskFlow = csvFlows[0] || {};
+      let highestProbability = 0;
+
+      for (const flow of csvFlows) {
+        const res = classifyNetworkFlow(flow);
+        if (res.attackProbability > highestProbability) {
+          highestProbability = res.attackProbability;
+          highestRiskFlow = flow;
+        }
+      }
+
+      primaryMlResult = classifyNetworkFlow(highestRiskFlow);
+      extractedFeaturesSummary = {
+        inputType: 'CSV Network Flow Feature Vector',
+        totalFlowsAnalyzed: flowCount,
+        ...primaryMlResult.extractedFeatures,
+      };
+    } else {
+      // Process binary PCAP / PCAPNG buffer
+      const pcapResult = extractFlowsFromPcap(fileName, file.buffer);
+      totalPackets = pcapResult.totalPackets;
+      flowCount = pcapResult.flows.length;
+
+      let targetFlow: Partial<NetworkFlowFeatures> = {};
+      let maxRisk = -1;
+
+      for (const flow of pcapResult.flows) {
+        const evalRes = classifyNetworkFlow(flow);
+        if (evalRes.attackProbability > maxRisk) {
+          maxRisk = evalRes.attackProbability;
+          targetFlow = flow;
+        }
+      }
+
+      if (pcapResult.flows.length === 0) {
+        // Fallback for packet captures with non-IP frames
+        targetFlow = {
+          flowDurationMs: 1000,
+          totalFwdPackets: totalPackets,
+          totalBwdPackets: 0,
+          flowPacketsPerSec: totalPackets,
+        };
+      }
+
+      primaryMlResult = classifyNetworkFlow(targetFlow);
+      extractedFeaturesSummary = {
+        inputType: 'Binary PCAP Frame Aggregation',
+        parsedPacketsCount: totalPackets,
+        aggregatedFlowsCount: flowCount,
+        primaryProtocol: pcapResult.summary.primaryProtocol,
+        ...primaryMlResult.extractedFeatures,
+      };
+    }
+
+    const analysisDuration = Number(((Date.now() - startTime) / 1000 + 0.15).toFixed(2));
     const scanId = `SCAN-${Math.floor(1000 + Math.random() * 9000)}`;
-    const analysisDuration = Number((1.2 + Math.random() * 1.5).toFixed(2));
     const createdAt = new Date().toISOString();
 
-    const topFeaturesMapped = mlResult.topFeatures.map(f => ({
+    const topFeaturesMapped = primaryMlResult.topFeatures.map(f => ({
       name: f.featureName,
       value: f.value,
       importance: f.impactScore,
       description: f.description,
+      direction: f.direction,
     }));
 
     const db = getDb();
@@ -108,20 +254,20 @@ router.post('/upload', requireAuth, upload.single('file'), (req: AuthenticatedRe
       totalPackets,
       flowCount,
       analysisDuration,
-      mlResult.attackProbability,
-      mlResult.classifiedThreat,
-      mlResult.riskLevel,
-      mlResult.predictedConfidence,
-      JSON.stringify(mlResult.extractedFeatures),
+      primaryMlResult.attackProbability,
+      primaryMlResult.classifiedThreat,
+      primaryMlResult.riskLevel,
+      primaryMlResult.predictedConfidence,
+      JSON.stringify(extractedFeaturesSummary),
       JSON.stringify(topFeaturesMapped),
-      createdAt
+      createdAt,
     ]);
 
     stmt.free();
     saveDb();
 
     res.status(201).json({
-      message: 'PCAP analysis completed successfully',
+      message: 'Network file analysis completed successfully',
       scan: {
         id: scanId,
         fileName,
@@ -129,17 +275,18 @@ router.post('/upload', requireAuth, upload.single('file'), (req: AuthenticatedRe
         totalPackets,
         flowCount,
         analysisDurationSeconds: analysisDuration,
-        attackProbability: mlResult.attackProbability,
-        classifiedThreat: mlResult.classifiedThreat,
-        riskLevel: mlResult.riskLevel,
-        predictedConfidence: mlResult.predictedConfidence,
-        extractedFeatures: mlResult.extractedFeatures,
+        attackProbability: primaryMlResult.attackProbability,
+        classifiedThreat: primaryMlResult.classifiedThreat,
+        riskLevel: primaryMlResult.riskLevel,
+        predictedConfidence: primaryMlResult.predictedConfidence,
+        mitreMapping: primaryMlResult.mitreMapping,
+        extractedFeatures: extractedFeaturesSummary,
         topFeatures: topFeaturesMapped,
-        createdAt
-      }
+        createdAt,
+      },
     });
   } catch (err: any) {
-    res.status(500).json({ error: err.message || 'PCAP analysis failed' });
+    res.status(400).json({ error: err.message || 'Network file analysis failed' });
   }
 });
 

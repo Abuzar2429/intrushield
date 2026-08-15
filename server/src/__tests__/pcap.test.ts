@@ -13,7 +13,11 @@ describe('PCAP Analysis REST API Endpoints', () => {
   });
 
   it('should process PCAP file upload and return classification results with auth token', async () => {
-    const dummyBuffer = Buffer.from('DUMMY_PCAP_PACKET_DATA_HEADER');
+    const dummyBuffer = Buffer.alloc(24);
+    dummyBuffer.writeUInt32BE(0xa1b2c3d4, 0); // Magic
+    dummyBuffer.writeUInt16BE(2, 4);          // Major version
+    dummyBuffer.writeUInt16BE(4, 6);          // Minor version
+    dummyBuffer.writeUInt32BE(1, 20);         // LinkType: Ethernet
 
     const res = await request(app)
       .post('/api/pcap/upload')
