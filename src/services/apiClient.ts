@@ -67,6 +67,16 @@ export const authApi = {
     return res;
   },
 
+  googleLogin: async (credential: string) => {
+    const res = await request<{ message: string; token: string; user: any }>('/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ credential }),
+    });
+    setStoredToken(res.token);
+    setStoredUser(res.user);
+    return res;
+  },
+
   register: async (details: { email: string; password: string; name: string; role?: string }) => {
     const res = await request<{ message: string; token: string; user: any }>('/auth/register', {
       method: 'POST',
@@ -191,6 +201,23 @@ export const mitigationApi = {
 
   getActiveRules: async () => {
     return request<{ rules: any[]; count: number }>('/mitigation/active-rules');
+  },
+};
+
+export const usersApi = {
+  getUsers: async () => {
+    return request<{ users: any[]; count: number }>('/users');
+  },
+
+  updateRole: async (userId: string, role: string) => {
+    return request<{ message: string; userId: string; newRole: string }>(`/users/${userId}/role`, {
+      method: 'PATCH',
+      body: JSON.stringify({ role }),
+    });
+  },
+
+  getAuditLogs: async () => {
+    return request<{ logs: any[]; count: number }>('/users/audit-logs');
   },
 };
 

@@ -71,6 +71,17 @@ export interface NetworkFlowFeatures {
   payloadEntropy: number;
   destinationPortCategory: number; // 21: FTP, 22: SSH, 80/443: Web, 53: DNS, 0: Other
   sourceDiversityRatio: number;    // Unique Src IPs / Total Flows in 10s Window
+
+  // Optional compatibility aliases
+  flowDurationMs?: number;
+  synFlagRatio?: number;
+  asymmetricRatio?: number;
+  flowIATMean?: number;
+  flowIATStd?: number;
+  flowIATMax?: number;
+  flowIATMin?: number;
+  fwdIATMean?: number;
+  bwdIATMean?: number;
 }
 
 export interface PcapParseResult {
@@ -193,9 +204,9 @@ function parsePcapNgBuffer(buffer: Buffer): ParsedPacket[] {
         const tsHigh = buffer.readUInt32LE(offset + 12);
         const tsLow = buffer.readUInt32LE(offset + 16);
         const capLen = buffer.readUInt32LE(offset + 20);
-        const timestampMs = Math.floor(((BigInt(tsHigh) << 32n) | BigInt(tsLow)) / 1000n);
+        const timestampMs = Number(((BigInt(tsHigh) << 32n) | BigInt(tsLow)) / 1000n);
         const packetData = buffer.subarray(offset + 28, offset + 28 + capLen);
-        const parsed = parseEthernetFrame(packetData, Number(timestampMs));
+        const parsed = parseEthernetFrame(packetData, timestampMs);
         if (parsed) packets.push(parsed);
       }
     } else if (blockType === 0x00000003) {

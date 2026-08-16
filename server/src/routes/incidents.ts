@@ -41,9 +41,16 @@ function queryObjects(sql: string, params: any[] = []): Record<string, any>[] {
 router.get('/', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
     const { status, severity } = req.query;
+    const isClient = req.user?.role === 'Client';
+    const userId = req.user?.id;
+
     let sql = 'SELECT * FROM incidents WHERE 1=1';
     const params: any[] = [];
 
+    if (isClient) {
+      sql += ' AND (user_id = ? OR user_id IS NULL)';
+      params.push(userId);
+    }
     if (status && typeof status === 'string') {
       sql += ' AND status = ?';
       params.push(status);
@@ -58,6 +65,7 @@ router.get('/', requireAuth, (req: AuthenticatedRequest, res: Response) => {
     const rows = queryObjects(sql, params);
     const incidents = rows.map(r => ({
       id: r.id,
+      userId: r.user_id,
       title: r.title,
       severity: r.severity,
       status: r.status,
@@ -75,7 +83,7 @@ router.get('/', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   }
 });
 
-// Get Single Incident by ID (Protected)
+// Get Single Incident by ID (Protected & Ownership Checked)
 router.get('/:id', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
@@ -88,8 +96,16 @@ router.get('/:id', requireAuth, (req: AuthenticatedRequest, res: Response) => {
     }
 
     const r = rows[0];
+    const isClient = req.user?.role === 'Client';
+
+    if (isClient && r.user_id && r.user_id !== req.user?.id) {
+      res.status(403).json({ error: 'Access denied to target incident record' });
+      return;
+    }
+
     const incident = {
       id: r.id,
+      userId: r.user_id,
       title: r.title,
       severity: r.severity,
       status: r.status,
@@ -107,7 +123,7 @@ router.get('/:id', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   }
 });
 
-// Create New Incident (Protected)
+// Create New Incident (Protected & Ownership Saved)
 router.post('/', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   const parseResult = createIncidentSchema.safeParse(req.body);
   if (!parseResult.success) {
@@ -125,18 +141,20 @@ router.post('/', requireAuth, (req: AuthenticatedRequest, res: Response) => {
     const finalStatus = status || 'Active';
     const finalScore = typeof threatScore === 'number' ? threatScore : 75;
     const finalMitigation = mitigationStatus || 'Investigating';
+    const uId = req.user?.id || null;
 
     const stmt = db.prepare(`
-      INSERT INTO incidents (id, title, severity, status, source_ip, target_ip, threat_score, description, timestamp, mitigation_status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO incidents (id, user_id, title, severity, status, source_ip, target_ip, threat_score, description, timestamp, mitigation_status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    stmt.run([id, title, severity, finalStatus, sourceIp, targetIp, finalScore, description || '', timestamp, finalMitigation]);
+    stmt.run([id, uId, title, severity, finalStatus, sourceIp, targetIp, finalScore, description || '', timestamp, finalMitigation]);
     stmt.free();
     saveDb();
 
     const incident = {
       id,
+      userId: uId,
       title,
       severity,
       status: finalStatus,
@@ -154,7 +172,7 @@ router.post('/', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   }
 });
 
-// Update Incident Status & Mitigation (Protected)
+// Update Incident Status & Mitigation (Protected & Ownership Checked)
 router.patch('/:id/status', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   const parseResult = patchStatusSchema.safeParse(req.body);
   if (!parseResult.success) {
@@ -174,6 +192,13 @@ router.patch('/:id/status', requireAuth, (req: AuthenticatedRequest, res: Respon
     }
 
     const current = existing[0];
+    const isClient = req.user?.role === 'Client';
+
+    if (isClient && current.user_id && current.user_id !== req.user?.id) {
+      res.status(403).json({ error: 'Access denied to target incident record' });
+      return;
+    }
+
     const newStatus = status || current.status;
     const newMitigation = mitigationStatus || current.mitigation_status;
 
@@ -187,6 +212,7 @@ router.patch('/:id/status', requireAuth, (req: AuthenticatedRequest, res: Respon
       message: 'Incident updated successfully',
       incident: {
         id: cleanId,
+        userId: current.user_id,
         title: current.title,
         severity: current.severity,
         status: newStatus,

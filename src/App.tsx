@@ -25,6 +25,30 @@ import { SettingsPage } from './pages/SettingsPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { UsersAdminPage } from './pages/UsersAdminPage';
 
+import { getStoredUser } from './services/apiClient';
+import { ShieldAlert } from 'lucide-react';
+
+const AdminRouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const user = getStoredUser();
+  const isAdmin = user?.role === 'Administrator';
+
+  if (!isAdmin) {
+    return (
+      <div className="p-8 flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4 font-sans">
+        <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-500">
+          <ShieldAlert className="w-8 h-8" />
+        </div>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">403 - Access Denied</h2>
+        <p className="text-sm text-slate-600 dark:text-slate-400 max-w-md">
+          Administrator privileges are required to access this resource. Client accounts do not have clearance for system governance or configuration.
+        </p>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+};
+
 function App() {
   return (
     <ThemeProvider>
@@ -50,9 +74,9 @@ function App() {
               <Route path="/incidents/:id" element={<IncidentDetailsPage />} />
               <Route path="/reports" element={<ReportsPage />} />
               <Route path="/analytics" element={<AnalyticsPage />} />
-              <Route path="/models" element={<ModelsPage />} />
-              <Route path="/users" element={<UsersAdminPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/models" element={<AdminRouteGuard><ModelsPage /></AdminRouteGuard>} />
+              <Route path="/users" element={<AdminRouteGuard><UsersAdminPage /></AdminRouteGuard>} />
+              <Route path="/settings" element={<AdminRouteGuard><SettingsPage /></AdminRouteGuard>} />
               <Route path="/profile" element={<ProfilePage />} />
             </Route>
 

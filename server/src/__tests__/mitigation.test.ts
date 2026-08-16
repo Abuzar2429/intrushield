@@ -100,5 +100,25 @@ describe('ML Inference Engine & Mitigation REST API', () => {
 
       expect(res.status).toBe(401);
     });
+
+    it('should reject Client role from triggering IP mitigation (403 Forbidden)', async () => {
+      const clientRes = await request(app).post('/api/auth/register').send({
+        email: `client-mitigation-${Date.now()}@intrushield.io`,
+        password: 'Password123!',
+        name: 'Client Mitigation Test',
+      });
+      const clientToken = clientRes.body.token;
+
+      const res = await request(app)
+        .post('/api/mitigation/block-ip')
+        .set('Authorization', `Bearer ${clientToken}`)
+        .send({
+          ip: '198.51.100.45',
+          reason: 'Client trying to block IP',
+        });
+
+      expect(res.status).toBe(403);
+      expect(res.body).toHaveProperty('error');
+    });
   });
 });

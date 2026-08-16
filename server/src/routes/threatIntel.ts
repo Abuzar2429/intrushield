@@ -73,8 +73,8 @@ router.get('/', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   }
 });
 
-// Add New Threat Intel IOC (Protected)
-router.post('/', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+// Add New Threat Intel IOC (Protected & Administrator Only)
+router.post('/', requireAuth, requireRole('Administrator'), (req: AuthenticatedRequest, res: Response) => {
   const parseResult = addIocSchema.safeParse(req.body);
   if (!parseResult.success) {
     const errorMsg = parseResult.error.errors[0]?.message || 'Invalid IOC input payload';

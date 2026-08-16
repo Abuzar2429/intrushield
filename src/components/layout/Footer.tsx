@@ -19,7 +19,7 @@ export const Footer: React.FC = () => {
       <div className="flex items-center space-x-4">
         <span className="flex items-center space-x-1.5 text-emerald-600 dark:text-emerald-400 font-mono font-medium">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-          <span>git: main (Abuzar2429/intrushield)</span>
+          <span>IntruShield Core v1.0.0</span>
         </span>
         <span className="hidden sm:inline text-slate-300 dark:text-slate-700">|</span>
         <span className="flex items-center space-x-1 text-slate-400">

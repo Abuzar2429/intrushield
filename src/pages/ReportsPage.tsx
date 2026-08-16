@@ -97,7 +97,7 @@ export const ReportsPage: React.FC = () => {
 
         {/* Executive Summary Notes */}
         <div className="lg:col-span-5">
-          <Card title="Executive Notes & SOC Attestation" subtitle="Prepared by Ashraf (Lead SOC Analyst)">
+          <Card title="Executive Notes & SOC Attestation" subtitle="Prepared by IntruShield Security Operations">
             <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300 font-sans leading-relaxed">
               <p>
                 During the evaluated period (<strong>{dateRange}</strong>), IntruShield processed 100% of network edge traffic with zero unhandled drop events.

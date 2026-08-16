@@ -66,7 +66,7 @@ router.get('/active-rules', requireAuth, (req: AuthenticatedRequest, res: Respon
 });
 
 // Trigger Automated IP Mitigation Block Action (Protected & RBAC Enforced)
-router.post('/block-ip', requireAuth, requireRole('Administrator', 'Analyst'), (req: AuthenticatedRequest, res: Response) => {
+router.post('/block-ip', requireAuth, requireRole('Administrator'), (req: AuthenticatedRequest, res: Response) => {
   const parseResult = blockIpSchema.safeParse(req.body);
   if (!parseResult.success) {
     const errorMsg = parseResult.error.errors[0]?.message || 'Invalid mitigation payload';

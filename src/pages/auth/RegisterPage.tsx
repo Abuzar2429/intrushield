@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { GoogleLogin } from '@react-oauth/google';
 import { ShieldAlert, Lock, Mail, User, Shield, ArrowRight } from 'lucide-react';
 import { Button } from '../../components/common/Button';
 import { registerSchema, type RegisterFormData } from '../../utils/schemas';
-
 import { authApi } from '../../services/apiClient';
 
 export const RegisterPage: React.FC = () => {
@@ -29,7 +29,6 @@ export const RegisterPage: React.FC = () => {
         email: data.email,
         password: data.password,
         name: data.fullName,
-        role: 'SOC Analyst'
       });
       setIsLoading(false);
       navigate('/dashboard');
@@ -39,6 +38,22 @@ export const RegisterPage: React.FC = () => {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    if (!credentialResponse.credential) {
+      setErrorMessage('Google authentication did not return a valid credential.');
+      return;
+    }
+    setIsLoading(true);
+    setErrorMessage(null);
+    try {
+      await authApi.googleLogin(credentialResponse.credential);
+      setIsLoading(false);
+      navigate('/dashboard');
+    } catch (err: any) {
+      setIsLoading(false);
+      setErrorMessage(err.message || 'Google Sign-In failed.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6 font-sans">
@@ -48,10 +63,10 @@ export const RegisterPage: React.FC = () => {
             <ShieldAlert className="w-6 h-6" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-white">
-            Request SOC Clearance
+            Create IntruShield Account
           </h1>
           <p className="text-xs text-slate-400 font-mono">
-            Register your operator credentials for IntruShield access
+            Register your client user credentials for network security access
           </p>
         </div>
 
@@ -61,6 +76,25 @@ export const RegisterPage: React.FC = () => {
               ⚠️ {errorMessage}
             </div>
           )}
+
+          {/* 1-Click Google Registration */}
+          <div className="flex flex-col items-center justify-center space-y-3">
+            <div className="w-full flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setErrorMessage('Google Sign-In was cancelled or failed.')}
+                theme="filled_blue"
+                shape="pill"
+                text="signup_with"
+              />
+            </div>
+
+            <div className="w-full flex items-center space-x-3 my-2">
+              <div className="flex-1 h-px bg-slate-800"></div>
+              <span className="text-[11px] font-mono text-slate-500 uppercase">or register with password</span>
+              <div className="flex-1 h-px bg-slate-800"></div>
+            </div>
+          </div>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5">
               <label className="text-xs font-mono text-slate-300 flex items-center space-x-1">
@@ -69,7 +103,7 @@ export const RegisterPage: React.FC = () => {
               </label>
               <input
                 type="text"
-                placeholder="Ashraf"
+                placeholder="Jane Doe"
                 {...register('fullName')}
                 className="w-full px-3 py-2 text-sm font-mono bg-slate-950 border border-slate-800 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
               />
@@ -85,7 +119,7 @@ export const RegisterPage: React.FC = () => {
               </label>
               <input
                 type="email"
-                placeholder="ashraf@soc.internal"
+                placeholder="user@example.com"
                 {...register('email')}
                 className="w-full px-3 py-2 text-sm font-mono bg-slate-950 border border-slate-800 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
               />

@@ -9,10 +9,10 @@ import { useNavigate } from 'react-router-dom';
 export const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(getStoredUser() || {
-    name: 'Ashraf',
-    email: 'admin@intrushield.io',
-    role: 'Administrator',
-    id: 'usr-admin-01',
+    name: 'Security User',
+    email: 'user@intrushield.service',
+    role: 'Client',
+    id: 'usr-client-01',
     createdAt: new Date().toISOString()
   });
 

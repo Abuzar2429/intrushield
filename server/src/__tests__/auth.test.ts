@@ -4,15 +4,14 @@ import { app } from '../server';
 
 describe('Auth REST API Endpoints', () => {
   const testUser = {
-    name: 'Security Test Analyst',
-    email: `test-analyst-${Date.now()}@intrushield.io`,
+    name: 'Security Test Client',
+    email: `test-client-${Date.now()}@intrushield.io`,
     password: 'SecurePassword123!',
-    role: 'Analyst',
   };
 
   let token: string;
 
-  it('should register a new security user successfully', async () => {
+  it('should register a new security user with Client role automatically', async () => {
     const res = await request(app)
       .post('/api/auth/register')
       .send(testUser);
@@ -20,7 +19,23 @@ describe('Auth REST API Endpoints', () => {
     expect(res.status).toBe(201);
     expect(res.body).toHaveProperty('token');
     expect(res.body.user).toHaveProperty('email', testUser.email);
-    expect(res.body.user).toHaveProperty('id');
+    expect(res.body.user).toHaveProperty('role', 'Client');
+  });
+
+  it('should ignore role parameter in registration payload and still enforce Client role', async () => {
+    const maliciousUser = {
+      name: 'Hacker Wants Admin',
+      email: `hacker-${Date.now()}@intrushield.io`,
+      password: 'HackerPassword123!',
+      role: 'Administrator',
+    };
+
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send(maliciousUser);
+
+    expect(res.status).toBe(201);
+    expect(res.body.user).toHaveProperty('role', 'Client');
   });
 
   it('should reject registration with duplicate email', async () => {
@@ -66,7 +81,7 @@ describe('Auth REST API Endpoints', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.user).toHaveProperty('email', testUser.email);
-    expect(res.body.user).toHaveProperty('role', testUser.role);
+    expect(res.body.user).toHaveProperty('role', 'Client');
   });
 
   it('should reject profile request without valid Bearer token', async () => {

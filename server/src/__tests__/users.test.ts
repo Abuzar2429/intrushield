@@ -5,8 +5,8 @@ import { generateToken } from '../middleware/authMiddleware';
 
 describe('Users Admin REST API Endpoints', () => {
   let adminToken: string;
-  let analystToken: string;
-  let analystId: string;
+  let clientToken: string;
+  let clientId: string;
 
   beforeAll(async () => {
     // Register Admin
@@ -29,15 +29,15 @@ describe('Users Admin REST API Endpoints', () => {
       role: 'Administrator',
     });
 
-    // Register Analyst
-    const analystEmail = `analyst-${Date.now()}@intrushield.io`;
-    const analystRes = await request(app).post('/api/auth/register').send({
-      email: analystEmail,
-      password: 'AnalystPassword123!',
-      name: 'SOC Analyst One',
+    // Register Client
+    const clientEmail = `client-${Date.now()}@intrushield.io`;
+    const clientRes = await request(app).post('/api/auth/register').send({
+      email: clientEmail,
+      password: 'ClientPassword123!',
+      name: 'Client User One',
     });
-    analystToken = analystRes.body.token;
-    analystId = analystRes.body.user.id;
+    clientToken = clientRes.body.token;
+    clientId = clientRes.body.user.id;
   });
 
   it('should allow Administrator to fetch user list', async () => {
@@ -50,10 +50,20 @@ describe('Users Admin REST API Endpoints', () => {
     expect(Array.isArray(res.body.users)).toBe(true);
   });
 
-  it('should reject Analyst from fetching user list', async () => {
+  it('should reject Client from fetching user list (403 Forbidden)', async () => {
     const res = await request(app)
       .get('/api/users')
-      .set('Authorization', `Bearer ${analystToken}`);
+      .set('Authorization', `Bearer ${clientToken}`);
+
+    expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('error');
+  });
+
+  it('should reject Client from updating user roles (403 Forbidden)', async () => {
+    const res = await request(app)
+      .patch(`/api/users/${clientId}/role`)
+      .set('Authorization', `Bearer ${clientToken}`)
+      .send({ role: 'Administrator' });
 
     expect(res.status).toBe(403);
     expect(res.body).toHaveProperty('error');
@@ -61,7 +71,7 @@ describe('Users Admin REST API Endpoints', () => {
 
   it('should allow Administrator to update user role', async () => {
     const res = await request(app)
-      .patch(`/api/users/${analystId}/role`)
+      .patch(`/api/users/${clientId}/role`)
       .set('Authorization', `Bearer ${adminToken}`)
       .send({ role: 'Auditor' });
 

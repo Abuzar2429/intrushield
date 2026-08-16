@@ -34,7 +34,11 @@ __pycache__/
 *.pyc
 .pytest_cache/
 
-# Temporary user uploads and exports
-*.png
-*.pdf
+# Environment and secret files
+.env
+.env.*
+!.env.example
+server/.env
+server/.env.*
+!server/.env.example
 

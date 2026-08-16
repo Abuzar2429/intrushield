@@ -45,4 +45,39 @@ describe('Threat Intel REST API Endpoints', () => {
     expect(res.status).toBe(201);
     expect(res.body.ioc).toHaveProperty('ioc', newIoc.ioc);
   });
+
+  it('should reject Client role from deleting threat intel IOC (403 Forbidden)', async () => {
+    const clientRes = await request(app).post('/api/auth/register').send({
+      email: `client-threat-${Date.now()}@intrushield.io`,
+      password: 'Password123!',
+      name: 'Client Threat Intel Test',
+    });
+    const clientToken = clientRes.body.token;
+
+    const res = await request(app)
+      .delete('/api/threat-intel/TH-101')
+      .set('Authorization', `Bearer ${clientToken}`);
+
+    expect(res.status).toBe(403);
+    expect(res.body).toHaveProperty('error');
+  });
+
+  it('should allow Administrator to delete threat intel IOC', async () => {
+    const createRes = await request(app)
+      .post('/api/threat-intel')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        ioc: `198.51.100.${Math.floor(1 + Math.random() * 250)}`,
+        type: 'IPv4',
+        riskLevel: 'High',
+      });
+    const targetId = createRes.body.ioc.id;
+
+    const res = await request(app)
+      .delete(`/api/threat-intel/${targetId}`)
+      .set('Authorization', `Bearer ${authToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('id', targetId);
+  });
 });

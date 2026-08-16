@@ -2,7 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 function getJwtSecret(): string {
-  return process.env.JWT_SECRET || process.env.intrushield || 'intrushield-secret-key-soc-2026';
+  const secret = process.env.JWT_SECRET || process.env.intrushield;
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('[CRITICAL SECURITY ERROR] JWT_SECRET environment variable is missing in production environment.');
+    }
+    return 'intrushield-secret-key-soc-2026-dev-only';
+  }
+  return secret;
 }
 
 const JWT_SECRET = getJwtSecret();

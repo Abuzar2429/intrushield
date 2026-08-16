@@ -20,18 +20,23 @@ import {
 } from 'lucide-react';
 import { useMonitoring } from '../../context/MonitoringContext';
 
+import { getStoredUser } from '../../services/apiClient';
+
 interface NavItem {
   name: string;
   path: string;
   icon: React.ReactNode;
   badge?: number;
+  adminOnly?: boolean;
 }
 
 export const Sidebar: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { isLiveStreaming } = useMonitoring();
+  const currentUser = getStoredUser();
+  const isAdmin = currentUser?.role === 'Administrator';
 
-  const navItems: NavItem[] = [
+  const allNavItems: NavItem[] = [
     { name: 'SOC Dashboard', path: '/dashboard', icon: <Shield className="w-4 h-4" /> },
     { name: 'Live Monitoring', path: '/monitoring', icon: <Activity className="w-4 h-4" /> },
     { name: 'Packet Analysis', path: '/pcap-analysis', icon: <FileSearch className="w-4 h-4" /> },
@@ -41,11 +46,13 @@ export const Sidebar: React.FC = () => {
     { name: 'Incident Details', path: '/incidents', icon: <AlertOctagon className="w-4 h-4" />, badge: 3 },
     { name: 'Reports', path: '/reports', icon: <FileText className="w-4 h-4" /> },
     { name: 'Analytics', path: '/analytics', icon: <BarChart3 className="w-4 h-4" /> },
-    { name: 'Models & Governance', path: '/models', icon: <Layers className="w-4 h-4" /> },
-    { name: 'Team Governance', path: '/users', icon: <UserCheck className="w-4 h-4" /> },
-    { name: 'Settings', path: '/settings', icon: <Settings className="w-4 h-4" /> },
-    { name: 'Analyst Profile', path: '/profile', icon: <UserCheck className="w-4 h-4" /> },
+    { name: 'Models & Governance', path: '/models', icon: <Layers className="w-4 h-4" />, adminOnly: true },
+    { name: 'Team Governance', path: '/users', icon: <UserCheck className="w-4 h-4" />, adminOnly: true },
+    { name: 'Settings', path: '/settings', icon: <Settings className="w-4 h-4" />, adminOnly: true },
+    { name: 'User Profile', path: '/profile', icon: <UserCheck className="w-4 h-4" /> },
   ];
+
+  const navItems = allNavItems.filter(item => !item.adminOnly || isAdmin);
 
   return (
     <aside

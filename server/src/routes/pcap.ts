@@ -118,9 +118,18 @@ function parseCsvBuffer(buffer: Buffer): Partial<NetworkFlowFeatures>[] {
  */
 router.get('/scans', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
-    const rows = queryObjects('SELECT * FROM pcap_scans ORDER BY created_at DESC');
+    const isClient = req.user?.role === 'Client';
+    const userId = req.user?.id;
+
+    const sql = isClient
+      ? 'SELECT * FROM pcap_scans WHERE user_id = ? ORDER BY created_at DESC'
+      : 'SELECT * FROM pcap_scans ORDER BY created_at DESC';
+    const params = isClient ? [userId] : [];
+
+    const rows = queryObjects(sql, params);
     const scans = rows.map(r => ({
       id: r.id,
+      userId: r.user_id,
       fileName: r.file_name,
       fileSizeBytes: r.file_size_bytes,
       totalPackets: r.total_packets,
@@ -238,17 +247,19 @@ router.post('/upload', requireAuth, upload.single('file'), (req: AuthenticatedRe
       direction: f.direction,
     }));
 
+    const uId = req.user?.id || null;
     const db = getDb();
     const stmt = db.prepare(`
       INSERT INTO pcap_scans (
-        id, file_name, file_size_bytes, total_packets, flow_count,
+        id, user_id, file_name, file_size_bytes, total_packets, flow_count,
         analysis_duration_seconds, attack_probability, classified_threat,
         risk_level, predicted_confidence, extracted_features_json, top_features_json, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     stmt.run([
       scanId,
+      uId,
       fileName,
       fileSize,
       totalPackets,

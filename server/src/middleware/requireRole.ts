@@ -12,7 +12,7 @@ export function requireRole(...allowedRoles: string[]) {
       return;
     }
 
-    const userRole = req.user.role || 'Analyst';
+    const userRole = req.user.role || 'Client';
     if (!allowedRoles.includes(userRole)) {
       res.status(403).json({
         error: `Access denied. Requires one of the following roles: ${allowedRoles.join(', ')}.`

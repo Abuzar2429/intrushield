@@ -4,11 +4,13 @@ import { Sun, Moon, Bell, ShieldCheck, Pause, Play, UserCheck, Terminal } from '
 import { useTheme } from '../../context/ThemeContext';
 import { useMonitoring } from '../../context/MonitoringContext';
 import { Badge } from '../common/Badge';
+import { getStoredUser } from '../../services/apiClient';
 
 export const Navbar: React.FC = () => {
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
   const { threatScore, isLiveStreaming, toggleLiveStreaming, packetsPerSec } = useMonitoring();
+  const currentUser = getStoredUser();
 
   const getPageTitle = () => {
     switch (location.pathname) {
@@ -23,8 +25,8 @@ export const Navbar: React.FC = () => {
       case '/analytics': return 'SOC Traffic & Model Performance Analytics';
       case '/models': return 'AI Ensemble Governance & Online Retraining';
       case '/settings': return 'SOC System Settings & Alert Sensitivity';
-      case '/profile': return 'Senior SOC Analyst Clearance & Operator Profile';
-      default: return 'IntruShield Enterprise Security Platform';
+      case '/profile': return 'Security Operator Profile';
+      default: return 'IntruShield Security Service';
     }
   };
 
@@ -55,11 +57,11 @@ export const Navbar: React.FC = () => {
           <span>{(packetsPerSec / 1000).toFixed(1)}k PPS</span>
         </div>
 
-        {/* Bright Green Git Connected Badge */}
+        {/* Service Status Badge */}
         <div className="flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.25)]">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-          <span className="font-bold">GIT:</span>
-          <span>main (Abuzar2429/intrushield)</span>
+          <span className="font-bold">SERVICE:</span>
+          <span>ONLINE (IntruShield Core)</span>
         </div>
       </div>
 
@@ -105,8 +107,8 @@ export const Navbar: React.FC = () => {
             <UserCheck className="w-4 h-4" />
           </div>
           <div className="hidden lg:flex flex-col text-left">
-            <span className="text-xs font-medium text-slate-900 dark:text-slate-100">Ashraf (Lead SOC)</span>
-            <span className="text-[10px] text-slate-400 font-mono">LEVEL-3 ANALYST</span>
+            <span className="text-xs font-medium text-slate-900 dark:text-slate-100">{currentUser?.name || 'Security User'}</span>
+            <span className="text-[10px] text-slate-400 font-mono uppercase">{currentUser?.role || 'Client'}</span>
           </div>
         </div>
       </div>

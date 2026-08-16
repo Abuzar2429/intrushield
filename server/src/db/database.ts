@@ -53,16 +53,24 @@ export async function initDatabase() {
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
       email TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
+      password_hash TEXT,
+      google_id TEXT,
+      auth_provider TEXT NOT NULL DEFAULT 'local',
+      picture TEXT,
       name TEXT NOT NULL,
-      role TEXT NOT NULL DEFAULT 'Analyst',
+      role TEXT NOT NULL DEFAULT 'Client',
+      last_login TEXT,
+      last_activity TEXT,
       created_at TEXT NOT NULL
     );
   `);
 
+  try { db.run('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id);'); } catch (_e) {}
+
   db.run(`
     CREATE TABLE IF NOT EXISTS incidents (
       id TEXT PRIMARY KEY,
+      user_id TEXT,
       title TEXT NOT NULL,
       severity TEXT NOT NULL,
       status TEXT NOT NULL,
@@ -112,6 +120,7 @@ export async function initDatabase() {
   db.run(`
     CREATE TABLE IF NOT EXISTS pcap_scans (
       id TEXT PRIMARY KEY,
+      user_id TEXT,
       file_name TEXT NOT NULL,
       file_size_bytes INTEGER NOT NULL,
       total_packets INTEGER NOT NULL,
@@ -126,6 +135,62 @@ export async function initDatabase() {
       created_at TEXT NOT NULL
     );
   `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS audit_logs (
+      id TEXT PRIMARY KEY,
+      user_id TEXT,
+      email TEXT,
+      action TEXT NOT NULL,
+      endpoint TEXT NOT NULL,
+      method TEXT NOT NULL,
+      ip_address TEXT NOT NULL,
+      status_code INTEGER NOT NULL,
+      details_json TEXT,
+      created_at TEXT NOT NULL
+    );
+  `);
+
+  // Safe ALTER TABLE column migrations for legacy SQLite disk files
+  try { db.run('ALTER TABLE users ADD COLUMN last_login TEXT;'); } catch (_e) {}
+  try { db.run('ALTER TABLE users ADD COLUMN last_activity TEXT;'); } catch (_e) {}
+  try { db.run('ALTER TABLE pcap_scans ADD COLUMN user_id TEXT;'); } catch (_e) {}
+  try { db.run('ALTER TABLE incidents ADD COLUMN user_id TEXT;'); } catch (_e) {}
+  try { db.run('ALTER TABLE users ADD COLUMN google_id TEXT;'); } catch (_e) {}
+  try { db.run("ALTER TABLE users ADD COLUMN auth_provider TEXT DEFAULT 'local';"); } catch (_e) {}
+  try { db.run('ALTER TABLE users ADD COLUMN picture TEXT;'); } catch (_e) {}
+
+  // Migrate legacy users table to make password_hash nullable
+  try {
+    const tableInfo = db.exec("PRAGMA table_info(users);")[0];
+    if (tableInfo && tableInfo.values) {
+      const pwdCol = tableInfo.values.find((col: any) => col[1] === 'password_hash');
+      if (pwdCol && pwdCol[3] === 1) { // notnull constraint active
+        db.run(`
+          CREATE TABLE users_migration_temp (
+            id TEXT PRIMARY KEY,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT,
+            google_id TEXT,
+            auth_provider TEXT NOT NULL DEFAULT 'local',
+            picture TEXT,
+            name TEXT NOT NULL,
+            role TEXT NOT NULL DEFAULT 'Client',
+            last_login TEXT,
+            last_activity TEXT,
+            created_at TEXT NOT NULL
+          );
+        `);
+        db.run(`
+          INSERT INTO users_migration_temp (id, email, password_hash, google_id, auth_provider, picture, name, role, last_login, last_activity, created_at)
+          SELECT id, email, password_hash, google_id, auth_provider, picture, name, role, last_login, last_activity, created_at FROM users;
+        `);
+        db.run(`DROP TABLE users;`);
+        db.run(`ALTER TABLE users_migration_temp RENAME TO users;`);
+        db.run(`CREATE UNIQUE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id);`);
+      }
+    }
+  } catch (_e) {}
 
   seedDefaultData();
   saveDb();
